@@ -294,3 +294,187 @@ matrix["category"] = (
 
 print("\nOPPORTUNITY MATRIX")
 print(matrix)
+# -----------------------------
+# DEMAND MOMENTUM SCORE
+# -----------------------------
+
+momentum = (
+    merged
+    .sort_values("recorded_at")
+    .groupby("name")
+    .agg(
+        start_reviews=("review_count", "first"),
+        end_reviews=("review_count", "last")
+    )
+    .reset_index()
+)
+
+momentum["momentum_pct"] = (
+    (
+        momentum["end_reviews"]
+        -
+        momentum["start_reviews"]
+    )
+    /
+    momentum["start_reviews"]
+) * 100
+
+print("\nDEMAND MOMENTUM")
+print(
+    momentum.sort_values(
+        by="momentum_pct",
+        ascending=False
+    )
+)
+# -----------------------------
+# REVIEW GROWTH %
+# -----------------------------
+
+review_growth = (
+    merged
+    .sort_values("recorded_at")
+    .groupby("name")
+    .agg(
+        start_reviews=("review_count", "first"),
+        end_reviews=("review_count", "last")
+    )
+    .reset_index()
+)
+
+review_growth["review_growth_pct"] = (
+    (
+        review_growth["end_reviews"]
+        -
+        review_growth["start_reviews"]
+    )
+    /
+    review_growth["start_reviews"]
+) * 100
+
+print("\nREVIEW GROWTH %")
+print(
+    review_growth.sort_values(
+        by="review_growth_pct",
+        ascending=False
+    )
+)
+# -----------------------------
+# RISK PRODUCTS
+# -----------------------------
+
+risk_products = (
+    merged
+    .sort_values("recorded_at")
+    .groupby("name")
+    .agg(
+        avg_rating=("rating", "mean"),
+        avg_reviews=("review_count", "mean"),
+        avg_price=("price", "mean")
+    )
+    .reset_index()
+)
+
+risk_products["risk_score"] = (
+    (5 - risk_products["avg_rating"]) * 10
+)
+
+risk_products = risk_products.sort_values(
+    by="risk_score",
+    ascending=False
+)
+
+print("\nRISK PRODUCTS")
+print(
+    risk_products[
+        [
+            "name",
+            "avg_rating",
+            "risk_score"
+        ]
+    ]
+)
+# -----------------------------
+# BRAND GROWTH SCORE
+# -----------------------------
+
+brand_growth = (
+    merged
+    .sort_values("recorded_at")
+    .groupby("brand")
+    .agg(
+        start_reviews=("review_count", "first"),
+        end_reviews=("review_count", "last"),
+        avg_rating=("rating", "mean")
+    )
+    .reset_index()
+)
+
+brand_growth["growth_pct"] = (
+    (
+        brand_growth["end_reviews"]
+        -
+        brand_growth["start_reviews"]
+    )
+    /
+    brand_growth["start_reviews"]
+) * 100
+
+brand_growth["brand_growth_score"] = (
+    brand_growth["growth_pct"] * 0.7
+    +
+    brand_growth["avg_rating"] * 10 * 0.3
+)
+
+brand_growth = brand_growth.sort_values(
+    by="brand_growth_score",
+    ascending=False
+)
+
+print("\nBRAND GROWTH SCORE")
+print(
+    brand_growth[
+        [
+            "brand",
+            "growth_pct",
+            "avg_rating",
+            "brand_growth_score"
+        ]
+    ]
+)
+# -----------------------------
+# REVENUE OPPORTUNITY SCORE
+# -----------------------------
+
+latest_products = (
+    merged
+    .sort_values("recorded_at")
+    .groupby("name")
+    .tail(1)
+)
+
+latest_products["opportunity_score"] = (
+    latest_products["rating"] * 20
+    -
+    np.log1p(
+        latest_products["review_count"]
+    ) * 5
+)
+
+opportunity = (
+    latest_products[
+        [
+            "name",
+            "price",
+            "rating",
+            "review_count",
+            "opportunity_score"
+        ]
+    ]
+    .sort_values(
+        by="opportunity_score",
+        ascending=False
+    )
+)
+
+print("\nREVENUE OPPORTUNITY SCORE")
+print(opportunity)
