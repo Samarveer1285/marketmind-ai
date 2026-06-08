@@ -6,56 +6,29 @@ def answer_question(question):
 
     question = question.lower()
 
-    recommendations = (
-        generate_recommendations()
-    )
-
     if (
-        "marketing" in question
-        or
-        "recommend" in question
+        "grow" in question
+        or "growing" in question
+        or "momentum" in question
     ):
 
-        top_product = recommendations.iloc[0]
+        momentum = get_demand_momentum()
+
+        leader = momentum.iloc[0]
 
         return f"""
-Recommended Product:
+Fastest Growing Product:
 
-{top_product['product']}
+{leader['name']}
 
-Priority Score:
+Growth:
 
-{round(top_product['priority_score'],2)}
-
-Suggested Action:
-
-{top_product['recommendation']}
-"""
-
-    elif (
-        "risk" in question
-        or
-        "risky" in question
-    ):
-
-        risk = get_risk_products()
-
-        top_risk = risk.iloc[0]
-
-        return f"""
-Highest Risk Product:
-
-{top_risk['name']}
-
-Risk Score:
-
-{round(top_risk['risk_score'],2)}
+{round(leader['momentum_pct'],2)}%
 """
 
     elif (
         "brand" in question
-        or
-        "company" in question
+        and "grow" in question
     ):
 
         brand = get_brand_growth()
@@ -73,25 +46,120 @@ Growth Score:
 """
 
     elif (
-        "grow" in question
-        or
-        "growing" in question
-        or
-        "momentum" in question
+        "marketing" in question
+        or "recommend" in question
     ):
 
-        momentum = get_demand_momentum()
+        recommendations = generate_recommendations()
 
-        leader = momentum.iloc[0]
+        top = recommendations.iloc[0]
 
         return f"""
-Fastest Growing Product:
+Recommended Product:
 
-{leader['name']}
+{top['product']}
 
-Growth:
+Priority Score:
 
-{round(leader['momentum_pct'],2)}%
+{top['priority_score']}
+
+Action:
+
+{top['recommendation']}
+"""
+
+    elif (
+        "risk" in question
+        or "risky" in question
+    ):
+
+        risk = get_risk_products()
+
+        top = risk.iloc[0]
+
+        return f"""
+Highest Risk Product:
+
+{top['name']}
+
+Risk Score:
+
+{round(top['risk_score'],2)}
+"""
+
+    elif (
+        "hidden gem" in question
+        or "underrated" in question
+    ):
+
+        gems = get_hidden_gems()
+
+        top = gems.iloc[0]
+
+        return f"""
+Top Hidden Gem:
+
+{top['name']}
+
+Rating:
+
+{round(top['rating'],2)}
+"""
+
+    elif (
+        "undervalued" in question
+        or "best value" in question
+    ):
+
+        value = get_undervalued_products()
+
+        top = value.iloc[0]
+
+        return f"""
+Best Value Product:
+
+{top['name']}
+
+Value Score:
+
+{round(top['value_score'],2)}
+"""
+
+    elif (
+        "price drop" in question
+        or "cheapest" in question
+    ):
+
+        drops = get_biggest_price_drops()
+
+        top = drops.iloc[0]
+
+        return f"""
+Largest Price Drop:
+
+{top['name']}
+
+Price Change:
+
+{round(top['price_change_pct'],2)}%
+"""
+
+    elif (
+        "trust" in question
+    ):
+
+        trust = get_customer_trust()
+
+        top = trust.iloc[0]
+
+        return f"""
+Most Trusted Product:
+
+{top['name']}
+
+Trust Score:
+
+{round(top['trust_score'],2)}
 """
 
     else:
@@ -103,4 +171,8 @@ Try asking:
 - Which brand is growing?
 - Which product deserves marketing?
 - Which product is risky?
+- Which product is undervalued?
+- Which product is a hidden gem?
+- Which product has highest trust?
+- Which product had biggest price drop?
 """
