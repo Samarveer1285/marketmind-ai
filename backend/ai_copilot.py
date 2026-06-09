@@ -1,178 +1,89 @@
+from dotenv import load_dotenv
+import os
+import google.generativeai as genai
+
 from analytics_function import *
 from recommendation_engine import *
+
+load_dotenv()
+
+genai.configure(
+    api_key=os.getenv("GEMINI_API_KEY")
+)
+
+model = genai.GenerativeModel(
+    "gemini-2.5-flash"
+)
 
 
 def answer_question(question):
 
-    question = question.lower()
-
-    if (
-        "grow" in question
-        or "growing" in question
-        or "momentum" in question
-    ):
-
-        momentum = get_demand_momentum()
-
-        leader = momentum.iloc[0]
-
-        return f"""
-Fastest Growing Product:
-
-{leader['name']}
-
-Growth:
-
-{round(leader['momentum_pct'],2)}%
-"""
-
-    elif (
-        "brand" in question
-        and "grow" in question
-    ):
-
-        brand = get_brand_growth()
-
-        leader = brand.iloc[0]
-
-        return f"""
-Fastest Growing Brand:
-
-{leader['brand']}
-
-Growth Score:
-
-{round(leader['brand_growth_score'],2)}
-"""
-
-    elif (
-        "marketing" in question
-        or "recommend" in question
-    ):
+    try:
 
         recommendations = generate_recommendations()
 
-        top = recommendations.iloc[0]
+        top_product = recommendations.iloc[0]
 
-        return f"""
-Recommended Product:
+        risk_products = get_risk_products()
 
-{top['product']}
+        top_risk = risk_products.iloc[0]
+
+        brand_growth = get_brand_growth()
+
+        top_brand = brand_growth.iloc[0]
+
+        momentum = get_demand_momentum()
+
+        fastest_product = momentum.iloc[0]
+
+        prompt = f"""
+You are a senior market intelligence analyst.
+
+Use the market data below to answer the user's question.
+
+MARKET DATA
+
+Fastest Growing Product:
+{fastest_product['name']}
+
+Growth Percentage:
+{round(fastest_product['momentum_pct'], 2)}
+
+Fastest Growing Brand:
+{top_brand['brand']}
+
+Brand Growth Score:
+{round(top_brand['brand_growth_score'], 2)}
+
+Highest Opportunity Product:
+{top_product['product']}
 
 Priority Score:
+{round(top_product['priority_score'], 2)}
 
-{top['priority_score']}
+Recommended Action:
+{top_product['recommendation']}
 
-Action:
-
-{top['recommendation']}
-"""
-
-    elif (
-        "risk" in question
-        or "risky" in question
-    ):
-
-        risk = get_risk_products()
-
-        top = risk.iloc[0]
-
-        return f"""
 Highest Risk Product:
-
-{top['name']}
+{top_risk['name']}
 
 Risk Score:
+{round(top_risk['risk_score'], 2)}
 
-{round(top['risk_score'],2)}
+USER QUESTION:
+{question}
+
+Answer like a business analyst.
+Give insights and recommendations.
+Keep the answer concise.
 """
 
-    elif (
-        "hidden gem" in question
-        or "underrated" in question
-    ):
+        response = model.generate_content(
+            prompt
+        )
 
-        gems = get_hidden_gems()
+        return response.text
 
-        top = gems.iloc[0]
+    except Exception as e:
 
-        return f"""
-Top Hidden Gem:
-
-{top['name']}
-
-Rating:
-
-{round(top['rating'],2)}
-"""
-
-    elif (
-        "undervalued" in question
-        or "best value" in question
-    ):
-
-        value = get_undervalued_products()
-
-        top = value.iloc[0]
-
-        return f"""
-Best Value Product:
-
-{top['name']}
-
-Value Score:
-
-{round(top['value_score'],2)}
-"""
-
-    elif (
-        "price drop" in question
-        or "cheapest" in question
-    ):
-
-        drops = get_biggest_price_drops()
-
-        top = drops.iloc[0]
-
-        return f"""
-Largest Price Drop:
-
-{top['name']}
-
-Price Change:
-
-{round(top['price_change_pct'],2)}%
-"""
-
-    elif (
-        "trust" in question
-    ):
-
-        trust = get_customer_trust()
-
-        top = trust.iloc[0]
-
-        return f"""
-Most Trusted Product:
-
-{top['name']}
-
-Trust Score:
-
-{round(top['trust_score'],2)}
-"""
-
-    else:
-
-        return """
-Try asking:
-
-- Which product is growing?
-- Which brand is growing?
-- Which product deserves marketing?
-- Which product is risky?
-- Which product is undervalued?
-- Which product is a hidden gem?
-- Which product has highest trust?
-- Which product had biggest price drop?
-"""
+        return str(e)

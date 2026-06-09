@@ -1,14 +1,41 @@
 from database import supabase
+import random
 
-products = [
-    {"name": "iPhone 16", "brand": "Apple", "category": "Smartphone"},
-    {"name": "Galaxy S25", "brand": "Samsung", "category": "Smartphone"},
-    {"name": "Pixel 10", "brand": "Google", "category": "Smartphone"},
-    {"name": "OnePlus 14", "brand": "OnePlus", "category": "Smartphone"},
-    {"name": "Xiaomi 15", "brand": "Xiaomi", "category": "Smartphone"}
+brands = [
+    "Apple","Samsung","Google","OnePlus","Xiaomi",
+    "Sony","LG","Dell","HP","Lenovo",
+    "Asus","Acer","Boat","JBL","Nothing",
+    "Realme","Oppo","Vivo","MSI","BenQ"
 ]
 
-response = supabase.table("products").insert(products).execute()
+categories = [
+    "Smartphone",
+    "Laptop",
+    "Tablet",
+    "Smartwatch",
+    "Headphones",
+    "TV",
+    "Camera",
+    "Speaker",
+    "Monitor",
+    "Gaming Console"
+]
 
-print("Products Inserted Successfully")
-print(response)
+products = []
+
+for i in range(500):
+
+    brand = random.choice(brands)
+    category = random.choice(categories)
+
+    products.append({
+        "name": f"{brand} {category} {i+1}",
+        "brand": brand,
+        "category": category
+    })
+
+supabase.table(
+    "products"
+).insert(products).execute()
+
+print("500 Products Inserted")
