@@ -1,39 +1,105 @@
-from analytics_function import *
 import pandas as pd
+
+from load_products import get_latest_market_data
 
 
 def generate_market_alerts():
 
+    data = get_latest_market_data()
+
+    if data.empty:
+        return pd.DataFrame()
+
     alerts = []
 
-    growth = get_demand_momentum()
+    median_reviews = data["review_count"].median()
 
-    for _, row in growth.iterrows():
+    # ==========================
+    # Demand Opportunities
+    # ==========================
 
-        if row["momentum_pct"] > 15:
+    opportunities = data[
+        (data["rating"] >= 4.3)
+        &
+        (data["review_count"] >= median_reviews)
+        &
+        (data["discount_percent"] >= 30)
+    ]
 
-            alerts.append({
-                "type": "Opportunity",
-                "product": row["name"],
-                "message": f"Demand surged by {round(row['momentum_pct'],2)}%"
-            })
-
-        elif row["momentum_pct"] < -15:
-
-            alerts.append({
-                "type": "Risk",
-                "product": row["name"],
-                "message": f"Demand dropped by {round(abs(row['momentum_pct']),2)}%"
-            })
-
-    risk = get_risk_products()
-
-    for _, row in risk.head(5).iterrows():
+    for _, row in opportunities.iterrows():
 
         alerts.append({
-            "type": "High Risk",
-            "product": row["name"],
-            "message": f"Risk Score = {round(row['risk_score'],2)}"
+            "Type": "🟢 Opportunity",
+            "Product": row["title"],
+            "Category": row["category"],
+            "Message":
+                f"{row['rating']}★ rating, "
+                f"{int(row['discount_percent'])}% discount "
+                f"and strong engagement."
+        })
+
+    # ==========================
+    # Quality Risks
+    # ==========================
+
+    risks = data[
+        (data["rating"] < 3.8)
+        &
+        (data["review_count"] >= median_reviews)
+    ]
+
+    for _, row in risks.iterrows():
+
+        alerts.append({
+            "Type": "🔴 Risk",
+            "Product": row["title"],
+            "Category": row["category"],
+            "Message":
+                f"Low rating ({row['rating']}★) "
+                f"despite significant market visibility."
+        })
+
+    # ==========================
+    # Hidden Gems
+    # ==========================
+
+    hidden_gems = data[
+        (data["rating"] >= 4.4)
+        &
+        (data["review_count"] < 500)
+        &
+        (data["discount_percent"] >= 20)
+    ]
+
+    for _, row in hidden_gems.iterrows():
+
+        alerts.append({
+            "Type": "💎 Hidden Gem",
+            "Product": row["title"],
+            "Category": row["category"],
+            "Message":
+                f"{row['rating']}★ rated product "
+                f"with only {int(row['review_count'])} reviews."
+        })
+
+    # ==========================
+    # Market Leaders
+    # ==========================
+
+    leaders = data.nlargest(
+        5,
+        "review_count"
+    )
+
+    for _, row in leaders.iterrows():
+
+        alerts.append({
+            "Type": "⚡ Leader",
+            "Product": row["title"],
+            "Category": row["category"],
+            "Message":
+                f"Market leader with "
+                f"{int(row['review_count'])} reviews."
         })
 
     return pd.DataFrame(alerts)

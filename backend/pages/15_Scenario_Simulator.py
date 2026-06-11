@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 
-from analytics_function import load_data
+from load_products import get_latest_market_data
 from scenario_simulator import (
     simulate_price_change,
     simulate_rating_improvement,
@@ -29,11 +29,15 @@ apply_theme()
 # LOAD PRODUCTS
 # =====================================================
 
+live_data = get_latest_market_data()
+
+if live_data.empty:
+    st.warning("No live simulation data available.")
+    st.stop()
+
 products = sorted(
-    load_data()["name"].unique()
+    live_data["title"].unique()
 )
-
-
 # =====================================================
 # HEADER
 # =====================================================

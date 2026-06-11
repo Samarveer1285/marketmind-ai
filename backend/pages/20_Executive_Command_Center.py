@@ -1,12 +1,25 @@
-from live_market_alerts import generate_live_market_alerts
+
+import sys
+import os
+
+
+sys.path.append(
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            ".."
+        )
+    )
+)
+import ai_copilot
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
-
-from anomaly_detection import get_risk_products
+import pandas as pd
+from live_market_alerts import generate_live_market_alerts
+from live_opportunity_engine import generate_live_opportunities
+from load_products import get_latest_market_data
 from forecasting import forecast_reviews, forecast_price
-from analytics_function import get_demand_momentum
-from market_monitor import get_market_summary
 
 import ui_components
 from theme import apply_theme
@@ -22,25 +35,95 @@ st.set_page_config(
 )
 
 apply_theme()
-
+if st.button("🔄 Refresh Live Intelligence"):
+    st.cache_data.clear()
+    st.rerun()
 
 # =====================================================
 # LOAD DATA
 # =====================================================
+data: pd.DataFrame = get_latest_market_data()
 
-growth = get_demand_momentum()
+if data.empty:
+    st.warning("No live data found")
+    st.stop()
+apply_theme()
+growth = (
+    data.sort_values(
+        "review_count",
+        ascending=False
+    )
+    [
+        [
+            "title",
+            "review_count",
+            "rating"
+        ]
+    ]
+    .head(10)
+    .copy()
+)
 
-risk = get_risk_products()
+growth.columns = [
+    "name",
+    "momentum_pct",
+    "rating"
+]
+
+risk = data[
+    data["rating"] < 4
+].copy()
+
+risk["risk_score"] = (
+    (5 - risk["rating"])
+    * risk["review_count"]
+)
+
+risk["avg_rating"] = risk["rating"]
+
+risk["name"] = risk["title"]
+
+risk = risk.sort_values(
+    "risk_score",
+    ascending=False
+).head(10)
 
 alerts = generate_live_market_alerts()
 
-from live_opportunity_engine import generate_live_opportunities
+alerts = pd.DataFrame(alerts)
 
-recommendations = generate_live_opportunities()
+from recommendation_engine import generate_recommendations
+
+recommendations = generate_recommendations()
+
 
 review_forecasts = forecast_reviews()
 
 price_forecasts = forecast_price()
+try:
+    brief = ai_copilot.answer_question(
+        """
+        Summarize today's market situation.
+        Highlight opportunities, risks,
+        and recommended actions.
+        """
+    )
+except:
+    brief = "AI Brief temporarily unavailable due to Gemini rate limits."
+
+st.info(brief)
+
+st.subheader("🧠 AI Executive Brief")
+st.info(brief)
+
+
+
+
+from datetime import datetime
+
+st.caption(
+    f"Last Updated: {datetime.now().strftime('%d %b %Y, %I:%M %p')}"
+)
 
 
 # =====================================================
@@ -56,7 +139,18 @@ ui_components.page_header(
 # EXECUTIVE INSIGHTS
 # =====================================================
 
-summary = get_market_summary()
+data: pd.DataFrame = get_latest_market_data()
+
+if data.empty:
+    st.warning("No live data found")
+    st.stop()
+
+summary = {
+    "products": len(data),
+    "categories": data["category"].nunique(),
+    "avg_rating": round(data["rating"].mean(), 2),
+    "avg_price": round(data["price"].mean(), 2)
+}
 
 
 fastest_product = growth.iloc[0]
@@ -213,7 +307,6 @@ left, right = st.columns(
 
 
 with left:
-    import pandas as pd
     alerts_display = pd.DataFrame(alerts)
 
     ui_components.table_card(
@@ -227,9 +320,9 @@ with right:
     opportunity_display = (
         recommendations[
             [
-                "product_name",
-                "opportunity_score",
-                "keyword"
+                "product",
+                "priority_score",
+                "recommendation"
             ]
         ]
         .head(10)
@@ -347,16 +440,15 @@ st.write("")
 # =====================================================
 
 top_alert = (
-    alerts[0]["message"]
-    if len(alerts) > 0
+    alerts.iloc[0]["message"]
+    if not alerts.empty
     else "No critical alerts detected."
 )
 
 top_recommendation = (
-    f"Prioritize {recommendations.iloc[0]['product_name']} "
-    f"in the {recommendations.iloc[0]['keyword']} category "
-    f"(Opportunity Score: "
-    f"{round(recommendations.iloc[0]['opportunity_score'], 1)})"
+    f"{recommendations.iloc[0]['recommendation']} "
+    f"(Priority Score: "
+    f"{round(recommendations.iloc[0]['priority_score'], 1)})"
 )
 
 highest_review_forecast = (
@@ -510,4 +602,12 @@ with st.expander(
 
 st.caption(
     "MarketMind Executive Command Center consolidates opportunities, risks, alerts, and predictive intelligence into a single executive decision layer."
+)
+csv = recommendations.to_csv(index=False)
+
+st.download_button(
+    "⬇️ Download Executive Summary",
+    csv,
+    file_name="executive_summary.csv",
+    mime="text/csv"
 )

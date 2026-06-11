@@ -25,7 +25,13 @@ apply_theme()
 
 alerts = generate_market_alerts()
 
+if alerts.empty:
 
+    st.warning(
+        "No market alerts generated from the latest live data."
+    )
+
+    st.stop()
 # =====================================================
 # HEADER
 # =====================================================
@@ -45,19 +51,18 @@ total_alerts = len(
 )
 
 unique_alert_types = alerts[
-    "type"
+    "Type"
 ].nunique()
 
 products_impacted = alerts[
-    "product"
+    "Product"
 ].nunique()
 
 most_common_alert = (
-    alerts["type"]
+    alerts["Type"]
     .value_counts()
     .idxmax()
 )
-
 
 # =====================================================
 # KPI SECTION
@@ -125,7 +130,7 @@ left, right = st.columns(
 with left:
 
     alert_distribution = (
-        alerts["type"]
+        alerts["Type"]
         .value_counts()
         .reset_index()
     )
@@ -223,9 +228,9 @@ with left:
         "🚨 Active Market Alerts",
         alerts[
             [
-                "type",
-                "product",
-                "message"
+                "Type",
+                "Product",
+                "Message"
             ]
         ]
     )
@@ -234,7 +239,7 @@ with left:
 with right:
 
     alert_rankings = (
-        alerts["type"]
+        alerts["Type"]
         .value_counts()
         .reset_index()
     )
@@ -259,7 +264,7 @@ st.write("")
 # =====================================================
 
 product_alerts = (
-    alerts.groupby("product")
+    alerts.groupby("Product")
     .size()
     .reset_index(name="alert_count")
     .sort_values(
@@ -290,7 +295,8 @@ multi_alert_products = (
 
 ui_components.ai_brief_panel([
     f"There are currently {total_alerts} active alerts requiring leadership attention.",
-    f"{most_common_alert} is the most frequently occurring alert category.",
+    f"{unique_alert_types} different alert categories are being monitored in real time.",
+    f"{most_common_alert} is currently the dominant market signal.",
     f"{products_impacted} products are impacted by at least one market signal.",
     f"{multi_alert_products} products are affected by multiple alerts simultaneously.",
     "Products associated with repeated alerts should be escalated for immediate investigation.",

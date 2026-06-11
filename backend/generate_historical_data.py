@@ -1,153 +1,90 @@
-from database import supabase
-from datetime import datetime, timedelta
-import random
+import os
+from datetime import datetime
 
-products = (
-    supabase
-    .table("products")
-    .select("*")
-    .execute()
+import pandas as pd
+
+from database import supabase
+
+
+SNAPSHOT_DIR = os.path.join(
+    os.path.dirname(__file__),
+    "..",
+    "pipelines",
+    "snapshots"
 )
 
-history_records = []
+os.makedirs(SNAPSHOT_DIR, exist_ok=True)
 
-for product in products.data:
 
-    behaviour = random.choice([
-        "growing",
-        "declining",
-        "premium",
-        "hidden_gem"
-    ])
+KEYWORDS = [
+    "protein powder",
+    "running shoes",
+    "wireless earbuds"
+]
 
-    base_price = random.randint(
-        15000,
-        150000
-    )
 
-    base_reviews = random.randint(
-        100,
-        3000
-    )
+def collect_market_snapshots():
 
-    for day in range(30):
+    print("\nCollecting daily snapshots...")
 
-        date = (
-            datetime.now()
-            - timedelta(days=29-day)
+    today = str(datetime.now().date())
+
+    total_rows = 0
+
+    for keyword in KEYWORDS:
+
+        response = (
+            supabase
+            .table("market_products")
+            .select("*")
+            .eq("keyword", keyword)
+            .execute()
         )
 
-        if behaviour == "growing":
+        if not response.data:
 
-            reviews = (
-                base_reviews
-                + day * random.randint(10, 30)
-            )
+            print(f"No data found for {keyword}")
+            continue
 
-            rating = round(
-                random.uniform(4.3, 5.0),
-                1
-            )
+        df = pd.DataFrame(response.data)
 
-            price = (
-                base_price
-                + random.randint(-2000, 2000)
-            )
+        if df.empty:
+            continue
 
-        elif behaviour == "declining":
+        df["timestamp"] = datetime.now().isoformat()
 
-            reviews = max(
-                50,
-                base_reviews
-                - day * random.randint(5, 20)
-            )
+        filename = os.path.join(
+            SNAPSHOT_DIR,
+            f"{today}_{keyword.replace(' ', '_')}.csv"
+        )
 
-            rating = round(
-                random.uniform(3.5, 4.2),
-                1
-            )
+        df[
+            [
+                "keyword",
+                "product_name",
+                "price",
+                "rating",
+                "review_count",
+                "timestamp"
+            ]
+        ].to_csv(
+            filename,
+            index=False
+        )
 
-            price = (
-                base_price
-                - day * random.randint(20, 100)
-            )
+        total_rows += len(df)
 
-        elif behaviour == "premium":
-
-            reviews = (
-                base_reviews
-                + random.randint(-50, 50)
-            )
-
-            rating = round(
-                random.uniform(4.5, 5.0),
-                1
-            )
-
-            price = random.randint(
-                80000,
-                200000
-            )
-
-        else:
-
-            reviews = random.randint(
-                50,
-                500
-            )
-
-            rating = round(
-                random.uniform(4.5, 5.0),
-                1
-            )
-
-            price = random.randint(
-                10000,
-                60000
-            )
-
-        history_records.append({
-
-            "product_id":
-                product["id"],
-
-            "price":
-                price,
-
-            "rating":
-                rating,
-
-            "review_count":
-                reviews,
-
-            "recorded_at":
-                date.isoformat()
-        })
-
-print(
-    f"Generated {len(history_records)} records"
-)
-
-batch_size = 500
-
-for i in range(
-    0,
-    len(history_records),
-    batch_size
-):
-
-    batch = history_records[
-        i:i+batch_size
-    ]
-
-    supabase.table(
-        "price_history"
-    ).insert(batch).execute()
+        print(
+            f"✓ {keyword}: "
+            f"{len(df)} rows saved"
+        )
 
     print(
-        f"Inserted {i + len(batch)}"
+        f"\nSnapshots completed."
+        f"\nTotal rows: {total_rows}"
     )
 
-print(
-    "Historical Data Loaded Successfully"
-)
+
+if __name__ == "__main__":
+
+    collect_market_snapshots()

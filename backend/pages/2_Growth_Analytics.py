@@ -9,7 +9,8 @@ sys.path.append(
     )
 )
 
-from analytics_function import *
+from load_products import get_latest_market_data
+import pandas as pd
 import ui_components
 from theme import apply_theme
 
@@ -30,15 +31,107 @@ apply_theme()
 # LOAD DATA
 # =====================================================
 
-momentum = get_demand_momentum()
+data = get_latest_market_data()
 
-review_growth = get_review_growth()
-
-risk = get_risk_products()
-
-brand_growth = get_brand_growth()
+if data.empty:
+    st.warning("No live growth data available.")
+    st.stop()
 
 
+# =====================
+# DEMAND MOMENTUM
+# =====================
+
+momentum = (
+    data.sort_values(
+        "review_count",
+        ascending=False
+    )
+    [
+        [
+            "title",
+            "review_count"
+        ]
+    ]
+    .head(50)
+    .rename(
+        columns={
+            "title": "name",
+            "review_count": "momentum_pct"
+        }
+    )
+)
+
+
+# =====================
+# REVIEW GROWTH
+# =====================
+
+review_growth = momentum.copy()
+
+
+# =====================
+# RISK PRODUCTS
+# =====================
+
+risk = data.copy()
+
+risk["risk_score"] = (
+    (5 - risk["rating"])
+    *
+    risk["review_count"]
+)
+
+risk["avg_rating"] = risk["rating"]
+
+risk = (
+    risk.sort_values(
+        "risk_score",
+        ascending=False
+    )
+    .rename(
+        columns={
+            "title": "name"
+        }
+    )
+)
+
+
+# =====================
+# BRAND GROWTH
+# =====================
+
+brand_growth = (
+    data.groupby("brand")
+    .agg(
+        total_reviews=(
+            "review_count",
+            "sum"
+        ),
+        avg_rating=(
+            "rating",
+            "mean"
+        )
+    )
+    .reset_index()
+)
+
+brand_growth["brand_growth_score"] = (
+    brand_growth["total_reviews"] / 1000
+    +
+    brand_growth["avg_rating"] * 10
+)
+
+brand_growth["growth_pct"] = (
+    brand_growth["total_reviews"]
+    /
+    brand_growth["total_reviews"].max()
+) * 100
+
+brand_growth = brand_growth.sort_values(
+    "brand_growth_score",
+    ascending=False
+)
 # =====================================================
 # PAGE HEADER
 # =====================================================

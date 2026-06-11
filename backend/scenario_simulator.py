@@ -1,4 +1,6 @@
-from analytics_function import *
+from load_products import get_latest_market_data
+import pandas as pd
+import numpy as np
 import pandas as pd
 import numpy as np
 
@@ -8,15 +10,13 @@ def simulate_price_change(
     price_change_pct
 ):
 
-    merged = load_data()
+    latest = get_latest_market_data()
 
-    latest = (
-        merged
-        .sort_values("recorded_at")
-        .groupby("name")
-        .tail(1)
+    latest = latest.rename(
+        columns={
+            "title": "name"
+        }
     )
-
     product = latest[
         latest["name"] == product_name
     ]
@@ -102,13 +102,12 @@ def simulate_rating_improvement(
     new_rating
 ):
 
-    merged = load_data()
+    latest = get_latest_market_data()
 
-    latest = (
-        merged
-        .sort_values("recorded_at")
-        .groupby("name")
-        .tail(1)
+    latest = latest.rename(
+        columns={
+            "title": "name"
+        }
     )
 
     product = latest[
@@ -223,15 +222,13 @@ def simulate_review_growth(
     growth_pct
 ):
 
-    merged = load_data()
+    latest = get_latest_market_data()
 
-    latest = (
-        merged
-        .sort_values("recorded_at")
-        .groupby("name")
-        .tail(1)
+    latest = latest.rename(
+        columns={
+            "title": "name"
+        }
     )
-
     product = latest[
         latest["name"] == product_name
     ]

@@ -8,8 +8,8 @@ sys.path.append(
         os.path.join(os.path.dirname(__file__), "..", "backend")
     )
 )
-
-from analytics_function import *
+from load_products import get_latest_market_data
+import pandas as pd
 import ui_components
 from theme import apply_theme
 
@@ -29,13 +29,58 @@ apply_theme()
 # =====================================================
 # LOAD DATA
 # =====================================================
+data = get_latest_market_data()
 
-overpriced = get_overpriced_products()
+if data.empty:
+    st.warning("No live pricing data available.")
+    st.stop()
 
-undervalued = get_undervalued_products()
+# Overpriced
+overpriced = (
+    data.sort_values("price", ascending=False)
+    [["title", "price"]]
+    .rename(columns={"title": "name"})
+)
 
-drops = get_biggest_price_drops()
+# Undervalued
+undervalued = data.copy()
 
+undervalued["value_score"] = (
+    undervalued["rating"] * 100
+    + undervalued["review_count"] / 100
+    - undervalued["price"] / 50
+)
+
+undervalued = (
+    undervalued.sort_values(
+        "value_score",
+        ascending=False
+    )
+    .rename(columns={"title": "name"})
+)
+
+# Biggest price drops (temporary)
+drops = data.copy()
+
+drops["price_change_pct"] = (
+    (
+        drops["original_price"]
+        - drops["price"]
+    )
+    /
+    drops["original_price"]
+) * 100
+
+drops = (
+    drops[
+        drops["price_change_pct"] > 0
+    ]
+    .sort_values(
+        "price_change_pct",
+        ascending=False
+    )
+    .rename(columns={"title": "name"})
+)
 
 # =====================================================
 # PAGE HEADER
@@ -56,7 +101,22 @@ most_expensive = overpriced.iloc[0]
 best_value = undervalued.iloc[0]
 
 largest_drop = drops.iloc[0]
+if overpriced.empty or undervalued.empty:
+    st.warning("Insufficient live pricing data.")
+    st.stop()
 
+most_expensive = overpriced.iloc[0]
+
+best_value = undervalued.iloc[0]
+
+largest_drop = (
+    drops.iloc[0]
+    if not drops.empty
+    else pd.Series({
+        "name": "N/A",
+        "price_change_pct": 0
+    })
+)
 avg_overpriced = round(
     overpriced["price"].mean(),
     0
@@ -195,11 +255,19 @@ st.write("")
 # VALUE OPPORTUNITY EXPLORER
 # =====================================================
 
+scatter_data = undervalued.head(30).copy()
+
+scatter_data["bubble_size"] = (
+    scatter_data["value_score"]
+    - scatter_data["value_score"].min()
+    + 1
+)
+
 value_scatter = px.scatter(
-    undervalued.head(30),
+    scatter_data,
     x="price",
     y="rating",
-    size="value_score",
+    size="bubble_size",
     color="value_score",
     hover_name="name",
     color_continuous_scale=[

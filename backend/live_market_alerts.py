@@ -18,9 +18,9 @@ def generate_live_market_alerts():
 
         alerts.append({
             "type": "Low Rating",
-            "product": row["product_name"],
+            "product": row["title"],
             "message": (
-                f"{row['product_name']} "
+                f"{row['title']} "
                 f"has a low rating of "
                 f"{row['rating']}."
             )

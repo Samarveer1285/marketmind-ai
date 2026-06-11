@@ -9,7 +9,8 @@ sys.path.append(
     )
 )
 
-from analytics_function import *
+from load_products import get_latest_market_data
+import pandas as pd
 import ui_components
 from theme import apply_theme
 
@@ -30,14 +31,119 @@ apply_theme()
 # LOAD DATA
 # =====================================================
 
-brand_health = get_brand_health()
+data = get_latest_market_data()
 
-leaderboard = get_market_leaderboard()
+if data.empty:
+    st.warning("No live executive data available.")
+    st.stop()
 
-opportunity = get_revenue_opportunity()
 
-growth = get_brand_growth()
+# ======================
+# BRAND HEALTH
+# ======================
 
+brand_health = (
+    data.groupby("brand")
+    .agg(
+        avg_rating=("rating", "mean"),
+        total_reviews=("review_count", "sum")
+    )
+    .reset_index()
+)
+
+brand_health["brand_health_score"] = (
+    brand_health["avg_rating"] * 10
+    +
+    brand_health["total_reviews"] / 1000
+)
+
+brand_health = brand_health.sort_values(
+    "brand_health_score",
+    ascending=False
+)
+
+
+# ======================
+# MARKET LEADERBOARD
+# ======================
+
+leaderboard = data.copy()
+
+leaderboard["market_score"] = (
+    leaderboard["rating"] * 10
+    +
+    leaderboard["review_count"] / 100
+)
+
+leaderboard = (
+    leaderboard.sort_values(
+        "market_score",
+        ascending=False
+    )
+    .rename(
+        columns={
+            "title": "name"
+        }
+    )
+)
+
+
+# ======================
+# REVENUE OPPORTUNITY
+# ======================
+
+opportunity = data.copy()
+
+opportunity["opportunity_score"] = (
+    opportunity["rating"] * 100
+    +
+    opportunity["review_count"] / 100
+    -
+    opportunity["price"] / 50
+)
+
+opportunity = (
+    opportunity.sort_values(
+        "opportunity_score",
+        ascending=False
+    )
+    .rename(
+        columns={
+            "title": "name"
+        }
+    )
+)
+
+
+# ======================
+# BRAND GROWTH
+# ======================
+
+growth = (
+    data.groupby("brand")
+    .agg(
+        total_reviews=("review_count", "sum"),
+        avg_rating=("rating", "mean")
+    )
+    .reset_index()
+)
+
+growth["brand_growth_score"] = (
+    growth["total_reviews"] / 1000
+    +
+    growth["avg_rating"] * 10
+)
+
+growth["growth_pct"] = (
+    growth["total_reviews"]
+    /
+    growth["total_reviews"].max()
+) * 100
+
+growth = growth.sort_values(
+    "brand_growth_score",
+    ascending=False
+)
 
 # =====================================================
 # PAGE HEADER
@@ -200,11 +306,21 @@ with left:
 
 with right:
 
+    opportunity_data = opportunity.head(20).copy()
+
+    opportunity_data["bubble_size"] = (
+        opportunity_data["opportunity_score"]
+        -
+        opportunity_data["opportunity_score"].min()
+        +
+        1
+    )
+
     opportunity_chart = px.scatter(
-        opportunity.head(20),
+        opportunity_data,
         x="review_count",
         y="rating",
-        size="opportunity_score",
+        size="bubble_size",
         color="opportunity_score",
         hover_name="name",
         color_continuous_scale=[
