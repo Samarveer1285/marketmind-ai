@@ -1,0 +1,52 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="7jFDr4omSmnu5Lm0sgFX">
+    <mxGraphModel dx="1873" dy="1022" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="6D542hV9l5JTUubSDD77-1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#1E3A5F;" value="&lt;font style=&quot;font-size: 34px;&quot;&gt;MARKETMIND AI&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="550" x="310" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#6B7280;" value="&lt;font style=&quot;font-size: 17px;&quot;&gt;Executive Intelligence Platform&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="550" x="310" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#93C5FD;strokeWidth=2;fontSize=13;verticalAlign=middle;arcSize=8;" value="&lt;b&gt;📦 DATA SOURCES&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;• Current Dataset&lt;br/&gt;• Flipkart Integration (Planned)" vertex="1">
+          <mxGeometry height="90" width="350" x="410" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-4" edge="1" parent="1" source="6D542hV9l5JTUubSDD77-3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748B;strokeWidth=3;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="6D542hV9l5JTUubSDD77-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CCFBF1;strokeColor=#5EEAD4;strokeWidth=2;fontSize=13;verticalAlign=middle;arcSize=8;" value="&lt;b&gt;📊 ANALYTICS LAYER&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;• Pricing Analytics&lt;br/&gt;• Growth Analytics&lt;br/&gt;• Brand Analytics&lt;br/&gt;• Category Intelligence&lt;br/&gt;• Competitor Benchmarking" vertex="1">
+          <mxGeometry height="120" width="350" x="410" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-6" edge="1" parent="1" source="6D542hV9l5JTUubSDD77-5" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748B;strokeWidth=3;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="6D542hV9l5JTUubSDD77-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#C4B5FD;strokeWidth=2;fontSize=13;verticalAlign=middle;arcSize=8;" value="&lt;b&gt;🧠 PREDICTIVE INTELLIGENCE LAYER&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Forecasting Engine&lt;br&gt;• Segmentation&lt;br&gt;• Anomaly Detection&lt;br&gt;• Opportunity Scoring" vertex="1">
+          <mxGeometry height="110" width="350" x="410" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-8" edge="1" parent="1" source="6D542hV9l5JTUubSDD77-7" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748B;strokeWidth=3;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="6D542hV9l5JTUubSDD77-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#FCD34D;strokeWidth=2;fontSize=13;verticalAlign=middle;arcSize=8;" value="&lt;b&gt;🤖 AI DECISION SUPPORT LAYER&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Gemini Analyst Copilot&lt;br&gt;• Natural Language Insights&lt;br&gt;• Business Recommendations" vertex="1">
+          <mxGeometry height="100" width="350" x="410" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-10" edge="1" parent="1" source="6D542hV9l5JTUubSDD77-9" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748B;strokeWidth=3;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="6D542hV9l5JTUubSDD77-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#F9A8D4;strokeWidth=2;fontSize=13;verticalAlign=middle;arcSize=8;" value="&lt;b&gt;📋 EXECUTIVE DECISION LAYER&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;• Executive Summary&lt;br/&gt;• Executive Scorecards&lt;br/&gt;• Command Center&lt;br/&gt;• Market Alerts&lt;br/&gt;• Scenario Simulator" vertex="1">
+          <mxGeometry height="120" width="350" x="410" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-12" edge="1" parent="1" source="6D542hV9l5JTUubSDD77-11" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748B;strokeWidth=3;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="6D542hV9l5JTUubSDD77-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#86EFAC;strokeWidth=2;fontSize=13;verticalAlign=middle;arcSize=8;" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b style=&quot;&quot;&gt;🎯 BUSINESS ACTIONS&lt;/b&gt;&lt;br&gt;&lt;br&gt;• 🎯Predict • 🚨Detect • 🎮Simulate&lt;br&gt;• 💡Recommend • ⚡Act&lt;/font&gt;" vertex="1">
+          <mxGeometry height="100" width="350" x="410" y="890" as="geometry" />
+        </mxCell>
+        <mxCell id="6D542hV9l5JTUubSDD77-14" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#9CA3AF;" value="Built by Samarveer Thakur  |  MarketMind AI v2.0  |  Executive Intelligence Platform" vertex="1">
+          <mxGeometry height="30" width="750" x="210" y="1000" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
