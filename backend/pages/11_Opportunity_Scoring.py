@@ -1,7 +1,6 @@
 import streamlit as st
 import plotly.express as px
-
-from opportunity_engine import *
+from live_opportunity_page import generate_live_opportunities
 
 import ui_components
 from theme import apply_theme
@@ -23,8 +22,15 @@ apply_theme()
 # LOAD DATA
 # =====================================================
 
-opportunities = get_top_opportunities()
+opportunities = generate_live_opportunities()
+if opportunities.empty:
 
+    st.warning(
+        "No live market data available. "
+        "Run the ingestion pipeline first."
+    )
+
+    st.stop()
 
 # =====================================================
 # HEADER

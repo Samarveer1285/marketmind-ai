@@ -1,41 +1,53 @@
-from database import supabase
-import random
+import pandas as pd
+import os
+import glob
 
-brands = [
-    "Apple","Samsung","Google","OnePlus","Xiaomi",
-    "Sony","LG","Dell","HP","Lenovo",
-    "Asus","Acer","Boat","JBL","Nothing",
-    "Realme","Oppo","Vivo","MSI","BenQ"
-]
 
-categories = [
-    "Smartphone",
-    "Laptop",
-    "Tablet",
-    "Smartwatch",
-    "Headphones",
-    "TV",
-    "Camera",
-    "Speaker",
-    "Monitor",
-    "Gaming Console"
-]
+SNAPSHOT_DIR = os.path.join(
+    os.path.dirname(__file__),
+    "..",
+    "pipelines",
+    "snapshots"
+)
 
-products = []
 
-for i in range(500):
+def get_latest_market_data():
 
-    brand = random.choice(brands)
-    category = random.choice(categories)
+    csv_files = glob.glob(
+        os.path.join(SNAPSHOT_DIR, "*.csv")
+    )
 
-    products.append({
-        "name": f"{brand} {category} {i+1}",
-        "brand": brand,
-        "category": category
-    })
+    if not csv_files:
+        return pd.DataFrame()
 
-supabase.table(
-    "products"
-).insert(products).execute()
+    latest_files = {}
 
-print("500 Products Inserted")
+    for file in csv_files:
+
+        filename = os.path.basename(file)
+
+        parts = filename.replace(".csv", "").split("_")
+
+        keyword = "_".join(parts[3:])
+
+        latest_files[keyword] = file
+
+    frames = []
+
+    for file in latest_files.values():
+
+        try:
+            df = pd.read_csv(file)
+
+            frames.append(df)
+
+        except Exception:
+            pass
+
+    if not frames:
+        return pd.DataFrame()
+
+    return pd.concat(
+        frames,
+        ignore_index=True
+    )

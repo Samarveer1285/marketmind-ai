@@ -9,7 +9,10 @@ sys.path.append(
     )
 )
 
-from analytics_function import *
+from live_dashboard_analytics import (
+    get_live_brand_health,
+    get_live_demand_momentum
+)
 import ui_components
 from theme import apply_theme
 
@@ -30,10 +33,21 @@ apply_theme()
 # LOAD DATA
 # =====================================================
 
-brand_health = get_brand_health()
+brand_health = get_live_brand_health()
 
-brand_growth = get_brand_growth()
+brand_growth = get_live_demand_momentum().rename(
+    columns={
+        "name": "brand",
+        "momentum_pct": "brand_growth_score"
+    }
+)
 
+if brand_health.empty or brand_growth.empty:
+    st.warning(
+        "No live market data available. "
+        "Run the ingestion pipeline first."
+    )
+    st.stop()
 
 # =====================================================
 # PAGE HEADER

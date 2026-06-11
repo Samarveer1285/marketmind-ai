@@ -1,12 +1,12 @@
+from live_market_alerts import generate_live_market_alerts
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 
-from recommendation_engine import generate_recommendations
 from anomaly_detection import get_risk_products
 from forecasting import forecast_reviews, forecast_price
-from market_alerts import generate_market_alerts
 from analytics_function import get_demand_momentum
+from market_monitor import get_market_summary
 
 import ui_components
 from theme import apply_theme
@@ -32,9 +32,11 @@ growth = get_demand_momentum()
 
 risk = get_risk_products()
 
-alerts = generate_market_alerts()
+alerts = generate_live_market_alerts()
 
-recommendations = generate_recommendations()
+from live_opportunity_engine import generate_live_opportunities
+
+recommendations = generate_live_opportunities()
 
 review_forecasts = forecast_reviews()
 
@@ -50,10 +52,12 @@ ui_components.page_header(
     "Mission control for executive decision-making."
 )
 
-
 # =====================================================
 # EXECUTIVE INSIGHTS
 # =====================================================
+
+summary = get_market_summary()
+
 
 fastest_product = growth.iloc[0]
 
@@ -62,7 +66,6 @@ highest_risk = risk.iloc[0]
 top_opportunity = recommendations.iloc[0]
 
 active_alerts = len(alerts)
-
 
 # =====================================================
 # KPI SECTION
@@ -76,39 +79,38 @@ col1, col2, col3, col4 = st.columns(
 with col1:
 
     ui_components.executive_card(
-        "🚀",
-        "Fastest Growth",
-        fastest_product["name"],
-        f"{fastest_product['momentum_pct']:.0f}% momentum"
+        "📦",
+        "Monitored Products",
+        summary["products"],
+        "Live market coverage"
     )
 
 with col2:
 
     ui_components.executive_card(
-        "⚠️",
-        "Highest Risk",
-        highest_risk["name"],
-        f"Risk Score {highest_risk['risk_score']:.1f}"
+        "🏷",
+        "Categories",
+        summary["categories"],
+        "Watchlist segments"
     )
 
 with col3:
 
     ui_components.executive_card(
-        "🚨",
-        "Active Alerts",
-        active_alerts,
-        "Critical market signals"
+        "⭐",
+        "Avg Rating",
+        summary["avg_rating"],
+        "Across live products"
     )
 
 with col4:
 
     ui_components.executive_card(
         "💰",
-        "Top Opportunity",
-        top_opportunity["product"],
-        f"Priority {top_opportunity['priority_score']:.1f}"
+        "Avg Price",
+        f"₹{summary['avg_price']}",
+        "Current market level"
     )
-
 
 st.write("")
 st.write("")
@@ -211,8 +213,8 @@ left, right = st.columns(
 
 
 with left:
-
-    alerts_display = alerts.copy()
+    import pandas as pd
+    alerts_display = pd.DataFrame(alerts)
 
     ui_components.table_card(
         "🚨 Critical Alerts",
@@ -225,9 +227,9 @@ with right:
     opportunity_display = (
         recommendations[
             [
-                "product",
-                "priority_score",
-                "recommendation"
+                "product_name",
+                "opportunity_score",
+                "keyword"
             ]
         ]
         .head(10)
@@ -345,13 +347,16 @@ st.write("")
 # =====================================================
 
 top_alert = (
-    alerts.iloc[0]["message"]
+    alerts[0]["message"]
     if len(alerts) > 0
     else "No critical alerts detected."
 )
 
 top_recommendation = (
-    recommendations.iloc[0]["recommendation"]
+    f"Prioritize {recommendations.iloc[0]['product_name']} "
+    f"in the {recommendations.iloc[0]['keyword']} category "
+    f"(Opportunity Score: "
+    f"{round(recommendations.iloc[0]['opportunity_score'], 1)})"
 )
 
 highest_review_forecast = (
@@ -438,7 +443,7 @@ with st.expander(
 ):
 
     st.dataframe(
-        alerts,
+        pd.DataFrame(alerts),
         use_container_width=True,
         hide_index=True
     )

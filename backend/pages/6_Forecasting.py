@@ -10,7 +10,7 @@ sys.path.append(
     )
 )
 
-from forecasting import *
+from live_forecasting import get_live_forecast_dataset
 import ui_components
 from theme import apply_theme
 
@@ -31,7 +31,15 @@ apply_theme()
 # LOAD DATA
 # =====================================================
 
-forecast_df = forecast_reviews()
+forecast_df = get_live_forecast_dataset()
+
+if forecast_df.empty:
+
+    st.warning(
+        "No historical market data available yet."
+    )
+
+    st.stop()
 
 
 # =====================================================
@@ -351,17 +359,22 @@ positive_forecasts = (
     forecast_matrix["Growth"] > 0
 ).sum()
 
+stable_forecasts = (
+    forecast_matrix["Growth"] == 0
+).sum()
+
 negative_forecasts = (
     forecast_matrix["Growth"] < 0
 ).sum()
 
 
 ui_components.ai_brief_panel([
-    f"{top_forecast['product']} is projected to achieve the highest future engagement.",
-    f"{highest_growth['product']} shows the strongest expected acceleration.",
-    f"{positive_forecasts} products are forecasted to gain momentum.",
-    f"{negative_forecasts} products may experience declining engagement.",
-    "Use forecast signals to prioritize inventory, marketing, and resource allocation."
+    f"{top_forecast['product']} currently has the highest projected engagement.",
+    f"{highest_growth['product']} demonstrates the strongest forecast momentum.",
+    f"{positive_forecasts} products are forecasted to grow.",
+    f"{stable_forecasts} products currently lack sufficient historical trend data.",
+    f"{negative_forecasts} products show declining momentum signals.",
+    "Forecast accuracy improves automatically as daily snapshots accumulate."
 ])
 
 

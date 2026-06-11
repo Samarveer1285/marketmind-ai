@@ -1,7 +1,9 @@
 import streamlit as st
 import plotly.express as px
-
-from competitor_benchmark import *
+from live_competitor_benchmark import (
+    get_live_brand_benchmark,
+    get_live_category_leaders
+)
 
 import ui_components
 from theme import apply_theme
@@ -22,10 +24,17 @@ apply_theme()
 # =====================================================
 # LOAD DATA
 # =====================================================
+benchmark = get_live_brand_benchmark()
 
-benchmark = get_brand_benchmark()
+leaders = get_live_category_leaders()
+if benchmark.empty or leaders.empty:
 
-leaders = get_category_leaders()
+    st.warning(
+        "No live market data available. "
+        "Run the ingestion pipeline first."
+    )
+
+    st.stop()
 
 
 # =====================================================

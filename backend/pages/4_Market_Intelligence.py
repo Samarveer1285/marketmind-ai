@@ -9,7 +9,11 @@ sys.path.append(
     )
 )
 
-from analytics_function import *
+from live_dashboard_analytics import (
+    get_live_market_leaderboard,
+    get_live_hidden_gems,
+    get_live_opportunity_matrix
+)
 import ui_components
 from theme import apply_theme
 
@@ -26,13 +30,34 @@ apply_theme()
 # DATA
 # ======================================================
 
-leaderboard = get_market_leaderboard()
+leaderboard = get_live_market_leaderboard()
 
-hidden_gems = get_hidden_gems()
+hidden_gems = get_live_hidden_gems()
 
-opportunity = get_opportunity_matrix()
+opportunity = get_live_opportunity_matrix()
 
-trust = get_customer_trust()
+trust = leaderboard.copy()
+
+trust["trust_score"] = (
+    trust["rating"] * 20
+    +
+    trust["review_count"] / 1000
+)
+
+trust = trust.sort_values(
+    "trust_score",
+    ascending=False
+)
+if (
+    leaderboard.empty
+    or hidden_gems.empty
+    or opportunity.empty
+):
+    st.warning(
+        "No live market data available. "
+        "Run the ingestion pipeline first."
+    )
+    st.stop()
 
 
 # ======================================================
@@ -54,7 +79,9 @@ top_market = leaderboard.iloc[0]
 top_trust = trust.iloc[0]
 
 star_count = (
-    opportunity["category"] == "Star"
+    opportunity["opportunity_score"]
+    >
+    opportunity["opportunity_score"].quantile(0.75)
 ).sum()
 
 
@@ -215,7 +242,7 @@ bubble = px.scatter(
     opportunity,
     x="review_count",
     y="rating",
-    size="review_count",
+    size="opportunity_score",
     color="category",
     hover_name="name",
     color_discrete_sequence=[

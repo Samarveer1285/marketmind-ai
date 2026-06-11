@@ -7,12 +7,11 @@ st.set_page_config(
 
 import plotly.express as px
 
-from analytics_function import (
-    get_brand_health,
-    get_market_leaderboard,
-    get_revenue_opportunity,
-    get_hidden_gems,
-    get_opportunity_matrix
+from live_dashboard_analytics import (
+    get_live_brand_health,
+    get_live_market_leaderboard,
+    get_live_hidden_gems,
+    get_live_opportunity_matrix
 )
 
 import ui_components
@@ -29,16 +28,18 @@ apply_theme()
 # ====================================
 # LOAD DATA
 # ====================================
+brand_health = get_live_brand_health()
 
-brand_health = get_brand_health()
+leaderboard = get_live_market_leaderboard()
 
-leaderboard = get_market_leaderboard()
+hidden_gems = get_live_hidden_gems()
 
-opportunities = get_revenue_opportunity()
+matrix = get_live_opportunity_matrix()
 
-hidden_gems = get_hidden_gems()
-
-matrix = get_opportunity_matrix()
+opportunities = matrix.sort_values(
+    "opportunity_score",
+    ascending=False
+)
 
 
 # ====================================
@@ -73,10 +74,10 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
 
     ui_components.executive_card(
-        "🏆",
-        "Market Leader",
-        brand_health.iloc[0]["brand"],
-        "Highest Brand Health"
+        "💎",
+        "Opportunity",
+        opportunities.iloc[0]["name"],
+        f"Score {opportunities.iloc[0]['opportunity_score']:.1f}"
     )
 
 with col2:
@@ -232,7 +233,7 @@ fig2 = px.scatter(
     matrix,
     x="review_count",
     y="rating",
-    size="review_count",
+    size="opportunity_score",
     color="category",
     hover_name="name"
 )
@@ -341,7 +342,7 @@ st.subheader(
 
 st.info(
     """
-Flipkart Integration (Upcoming)
+Watchlists + Live Market Monitor
 
 ⬇
 
@@ -452,19 +453,18 @@ roadmap_left, roadmap_right = st.columns(2)
 with roadmap_left:
 
     ui_components.ai_brief_panel([
-        "✅ Executive Analytics",
-        "✅ Forecasting Engine",
-        "✅ Scenario Simulation",
-        "✅ ML Surveillance",
-        "✅ AI Copilot"
+        f"{brand_health.iloc[0]['brand']} leads live market performance.",
+        f"{leaderboard.iloc[0]['name']} dominates the current market leaderboard.",
+        f"{len(hidden_gems)} hidden opportunities deserve investigation.",
+        f"{opportunities.iloc[0]['name']} represents today's strongest opportunity."
     ])
 
 
 with roadmap_right:
 
     ui_components.ai_brief_panel([
-        "⬜ Flipkart Integration",
-        "⬜ Real-Time Updates",
+        "✅ Live Market Monitor",
+        "✅ Snapshot Intelligence",
         "⬜ LangChain Agent",
         "⬜ Tool Calling",
         "⬜ Context-Aware AI"
