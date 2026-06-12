@@ -267,7 +267,7 @@ with left:
             [
                 "name",
                 "momentum_pct",
-                "avg_rating",
+                "rating",
                 "risk_score",
                 "portfolio_score"
             ]
@@ -292,7 +292,7 @@ with right:
             [
                 "name",
                 "momentum_pct",
-                "avg_rating",
+                "rating",
                 "risk_score",
                 "portfolio_score"
             ]

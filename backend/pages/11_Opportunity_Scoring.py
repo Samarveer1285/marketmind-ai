@@ -207,12 +207,30 @@ st.write("")
 # =====================================================
 # OPPORTUNITY MATRIX
 # =====================================================
+opportunities["opportunity_score"] = (
+    opportunities["opportunity_score"]
+    .fillna(0)
+)
 
+opportunities["momentum_pct"] = (
+    opportunities["momentum_pct"]
+    .fillna(0)
+)
+
+opportunities["avg_rating"] = (
+    opportunities["avg_rating"]
+    .fillna(0)
+)
+
+opportunities["risk_score"] = (
+    opportunities["risk_score"]
+    .fillna(0)
+)
 opportunity_matrix = px.scatter(
     opportunities,
     x="risk_score",
     y="momentum_pct",
-    size="opportunity_score",
+    size=opportunities["opportunity_score"].clip(lower=1),
     color="opportunity_score",
     hover_name="name",
     color_continuous_scale=[

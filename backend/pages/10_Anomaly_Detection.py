@@ -1,6 +1,6 @@
 import streamlit as st
 import plotly.express as px
-
+import pandas as pd
 from anomaly_detection import *
 
 import ui_components
@@ -26,6 +26,25 @@ apply_theme()
 price_anomalies = detect_price_anomalies()
 
 rating_anomalies = detect_rating_anomalies()
+if price_anomalies.empty:
+    price_anomalies = pd.DataFrame(
+        columns=[
+            "product",
+            "latest_price",
+            "average_price",
+            "deviation_pct"
+        ]
+    )
+
+if rating_anomalies.empty:
+    rating_anomalies = pd.DataFrame(
+        columns=[
+            "product",
+            "latest_rating",
+            "average_rating",
+            "deviation_pct"
+        ]
+    )
 
 
 # =====================================================
@@ -42,17 +61,37 @@ ui_components.page_header(
 # TOP INSIGHTS
 # =====================================================
 
-largest_price = price_anomalies.iloc[
-    price_anomalies["deviation_pct"]
-    .abs()
-    .idxmax()
-]
+if len(price_anomalies) > 0:
 
-largest_rating = rating_anomalies.iloc[
-    rating_anomalies["deviation_pct"]
-    .abs()
-    .idxmax()
-]
+    largest_price = price_anomalies.iloc[
+        price_anomalies["deviation_pct"]
+        .abs()
+        .idxmax()
+    ]
+
+else:
+
+    largest_price = {
+        "product": "No Price Anomalies",
+        "deviation_pct": 0
+    }
+
+
+if len(rating_anomalies) > 0:
+
+    largest_rating = rating_anomalies.iloc[
+        rating_anomalies["deviation_pct"]
+        .abs()
+        .idxmax()
+    ]
+
+else:
+
+    largest_rating = {
+        "product": "No Rating Anomalies",
+        "deviation_pct": 0
+    }
+
 
 total_price_alerts = len(
     price_anomalies
@@ -166,46 +205,47 @@ with left:
         price_chart
     )
 
-
 with right:
 
-    rating_chart = px.bar(
-        rating_anomalies.assign(
-            abs_dev=lambda x: x["deviation_pct"].abs()
-        ).sort_values(
-            "abs_dev",
-            ascending=True
-        ),
-        x="deviation_pct",
-        y="product",
-        orientation="h",
-        color="deviation_pct",
-        color_continuous_scale=[
-            "#EF4444",
-            "#F59E0B",
-            "#8EF2C2"
-        ]
-    )
+    if len(rating_anomalies) > 0:
 
-    rating_chart.update_layout(
-        title=None,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        coloraxis_showscale=False,
-        margin=dict(
-            l=10,
-            r=10,
-            t=10,
-            b=10
-        ),
-        xaxis_title="Rating Deviation (%)",
-        yaxis_title=""
-    )
+        rating_matrix = px.scatter(
+            rating_anomalies,
+            x="average_rating",
+            y="latest_rating",
+            size=rating_anomalies["deviation_pct"].abs(),
+            color="deviation_pct",
+            hover_name="product",
+            color_continuous_scale=[
+                "#EF4444",
+                "#F59E0B",
+                "#8EF2C2"
+            ]
+        )
 
-    ui_components.chart_card(
-        "⭐ Rating Anomaly Intelligence",
-        rating_chart
-    )
+        rating_matrix.update_layout(
+            title=None,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            coloraxis_showscale=False,
+            margin=dict(
+                l=10,
+                r=10,
+                t=10,
+                b=10
+            ),
+            xaxis_title="Average Rating",
+            yaxis_title="Latest Rating"
+        )
+
+        ui_components.chart_card(
+            "⭐ Rating Anomaly Matrix",
+            rating_matrix
+        )
+
+    else:
+
+        st.info("No rating anomalies available.")
 
 
 st.write("")
@@ -259,39 +299,47 @@ with left:
 
 with right:
 
-    rating_matrix = px.scatter(
-        rating_anomalies,
-        x="average_rating",
-        y="latest_rating",
-        size=rating_anomalies["deviation_pct"].abs(),
-        color="deviation_pct",
-        hover_name="product",
-        color_continuous_scale=[
-            "#EF4444",
-            "#F59E0B",
-            "#8EF2C2"
-        ]
-    )
+    if len(rating_anomalies) > 0:
 
-    rating_matrix.update_layout(
-        title=None,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        coloraxis_showscale=False,
-        margin=dict(
-            l=10,
-            r=10,
-            t=10,
-            b=10
-        ),
-        xaxis_title="Average Rating",
-        yaxis_title="Latest Rating"
-    )
+        rating_chart = px.bar(
+            rating_anomalies.assign(
+                abs_dev=lambda x: x["deviation_pct"].abs()
+            ).sort_values(
+                "abs_dev",
+                ascending=True
+            ),
+            x="deviation_pct",
+            y="product",
+            orientation="h",
+            color="deviation_pct",
+            color_continuous_scale=[
+                "#EF4444",
+                "#F59E0B",
+                "#8EF2C2"
+            ]
+        )
 
-    ui_components.chart_card(
-        "⭐ Rating Anomaly Matrix",
-        rating_matrix
-    )
+        rating_chart.update_layout(
+            title=None,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            coloraxis_showscale=False,
+            margin=dict(
+                l=10,
+                r=10,
+                t=10,
+                b=10
+            )
+        )
+
+        ui_components.chart_card(
+            "⭐ Rating Anomaly Intelligence",
+            rating_chart
+        )
+
+    else:
+
+        st.info("No rating anomalies detected.")
 
 
 st.write("")

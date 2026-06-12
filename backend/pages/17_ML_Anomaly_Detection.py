@@ -32,8 +32,11 @@ anomalies = detect_ml_anomalies()
 
 anomalies = anomalies.copy()
 
-anomalies["status"] = anomalies["anomaly"].apply(
-    lambda x: "Anomaly" if x in [-1, 1] and x == -1 else "Normal"
+anomalies["status"] = anomalies["anomaly"].map(
+    {
+        -1: "Anomaly",
+        1: "Normal"
+    }
 )
 
 
@@ -70,7 +73,7 @@ anomaly_rate = round(
         total_products
     ) * 100,
     1
-)
+) if total_products > 0 else 0
 
 
 # =====================================================
@@ -169,18 +172,37 @@ with left:
 
 with right:
 
-    surveillance_matrix = px.scatter(
-        anomalies,
-        x="price",
-        y="review_count",
-        color="status",
-        size="rating",
-        hover_name="name",
-        color_discrete_map={
-            "Anomaly": "#EF4444",
-            "Normal": "#8EF2C2"
-        }
+    scatter_data = anomalies.copy()
+
+    scatter_data["price"] = (
+        scatter_data["price"]
+        .fillna(
+            scatter_data["price"].median()
+        )
     )
+
+    scatter_data["rating"] = (
+        scatter_data["rating"]
+        .fillna(3)
+    )
+
+    scatter_data["review_count"] = (
+        scatter_data["review_count"]
+        .fillna(0)
+    )
+
+    surveillance_matrix = px.scatter(
+        scatter_data,
+            x="price",
+            y="review_count",
+            color="status",
+            size="rating",
+            hover_name="name",
+            color_discrete_map={
+                "Anomaly": "#EF4444",
+                "Normal": "#8EF2C2"
+            }
+        )
 
     surveillance_matrix.update_layout(
         title=None,
@@ -225,6 +247,16 @@ with left:
             ascending=False
         )
     )
+
+    if anomaly_products.empty:
+        anomaly_products = pd.DataFrame(
+            columns=[
+                "name",
+                "price",
+                "rating",
+                "review_count"
+            ]
+        )
 
     ui_components.table_card(
         "🚨 ML Detected Anomalies",

@@ -1,77 +1,71 @@
-from analytics_function import *
-
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
-
 import pandas as pd
+
+from market_monitor import get_latest_market_data
 
 
 def get_customer_segments():
 
-    merged = load_data()
+    data = get_latest_market_data()
 
-    latest = (
-        merged
-        .sort_values("recorded_at")
-        .groupby("name")
-        .tail(1)
+    if data.empty:
+        return pd.DataFrame(
+            columns=[
+                "customer",
+                "price",
+                "rating",
+                "review_count",
+                "segment_name"
+            ]
+        )
+
+    customer_data = data.copy()
+
+    # Treat each product as a customer persona
+    customer_data["customer"] = (
+        customer_data["product_name"]
     )
 
-    customer_data = latest[
-        [
-            "name",
-            "price",
-            "rating",
-            "review_count"
-        ]
-    ].copy()
-
-    customer_data.rename(
-        columns={
-            "name": "customer"
-        },
-        inplace=True
+    median_price = (
+        customer_data["price"]
+        .median()
     )
 
-    features = customer_data[
+    median_reviews = (
+        customer_data["review_count"]
+        .median()
+    )
+
+    customer_data["segment_name"] = "Value Seekers"
+
+    customer_data.loc[
+        (
+            (customer_data["price"] >= median_price)
+            &
+            (customer_data["rating"] >= 4.5)
+        ),
+        "segment_name"
+    ] = "Premium Buyers"
+
+    customer_data.loc[
+        (
+            (customer_data["review_count"] >= median_reviews)
+            &
+            (customer_data["rating"] >= 4.3)
+        ),
+        "segment_name"
+    ] = "Loyal Advocates"
+
+    customer_data.loc[
+        customer_data["rating"] < 4,
+        "segment_name"
+    ] = "Low Satisfaction"
+
+    return customer_data[
         [
+            "customer",
             "price",
             "rating",
-            "review_count"
+            "review_count",
+            "segment_name"
         ]
     ]
-
-    scaler = StandardScaler()
-
-    scaled = scaler.fit_transform(
-        features
-    )
-
-    model = KMeans(
-        n_clusters=4,
-        random_state=42,
-        n_init=10
-    )
-
-    customer_data[
-        "segment"
-    ] = model.fit_predict(
-        scaled
-    )
-
-    segment_names = {
-        0: "High Value",
-        1: "Loyal",
-        2: "Growth",
-        3: "Low Engagement"
-    }
-
-    customer_data[
-        "segment_name"
-    ] = customer_data[
-        "segment"
-    ].map(
-        segment_names
-    )
-
-    return customer_data

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from load_products import get_latest_market_data
+from market_monitor import get_latest_market_data
 
 
 def generate_live_opportunities():
@@ -21,8 +21,22 @@ def generate_live_opportunities():
         )
 
     opportunities = data.copy()
+    opportunities["rating"] = (
+        opportunities["rating"]
+        .fillna(0)
+    )
+
+    opportunities["review_count"] = (
+        opportunities["review_count"]
+        .fillna(0)
+    )
 
     opportunities["name"] = opportunities["product_name"]
+
+    opportunities["review_count"] = (
+        opportunities["review_count"]
+        .fillna(0)
+    )
 
     opportunities["start_reviews"] = (
         opportunities["review_count"] * 0.8
@@ -30,7 +44,7 @@ def generate_live_opportunities():
 
     opportunities["end_reviews"] = (
         opportunities["review_count"]
-    )
+    ).astype(int)
 
     opportunities["momentum_pct"] = (
         (

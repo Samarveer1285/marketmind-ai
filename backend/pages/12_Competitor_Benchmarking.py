@@ -172,7 +172,14 @@ with left:
 
 
 with right:
+    print(benchmark.columns.tolist())
+    print(benchmark.columns.duplicated())
 
+    print(leaders.columns.tolist())
+    print(leaders.columns.duplicated())
+
+    st.write(leaders.columns.tolist())
+    st.write(leaders.columns.duplicated())
     category_chart = px.bar(
         leaders,
         x="review_count",

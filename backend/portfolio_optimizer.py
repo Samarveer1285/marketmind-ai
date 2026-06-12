@@ -1,49 +1,70 @@
-from analytics_function import *
-from recommendation_engine import *
-
+from market_monitor import get_latest_market_data
 import pandas as pd
 
 
 def get_portfolio_scores():
 
-    momentum = get_demand_momentum()
+    data = get_latest_market_data()
 
-    risk = get_risk_products()
+    if data.empty:
+        return pd.DataFrame()
 
-    merged = momentum.merge(
-        risk,
-        on="name"
+    portfolio = data.copy()
+
+    portfolio["momentum_pct"] = (
+        portfolio["review_count"]
+        /
+        portfolio["review_count"].sum()
+        * 100
     )
 
-    merged[
-        "portfolio_score"
-    ] = (
-        merged["momentum_pct"]
+    portfolio["risk_score"] = (
+        (5 - portfolio["rating"]) * 20
         -
-        merged["risk_score"]
+        portfolio["review_count"] / 1000
     )
 
-    return (
-        merged.sort_values(
-            "portfolio_score",
-            ascending=False
+    portfolio["portfolio_score"] = (
+        portfolio["rating"] * 25
+        +
+        portfolio["review_count"] / 500
+        -
+        portfolio["price"] / 1000
+    )
+
+    portfolio = portfolio.dropna(
+        subset=[
+            "rating",
+            "review_count",
+            "price"
+        ]
+    )
+
+    if "product_name" in portfolio.columns:
+        portfolio = portfolio.rename(
+            columns={
+                "product_name": "name"
+            }
         )
+
+    return portfolio.sort_values(
+        "portfolio_score",
+        ascending=False
     )
 
 
 def get_invest_products():
 
-    portfolio = (
-        get_portfolio_scores()
-    )
+    portfolio = get_portfolio_scores()
 
     return portfolio.head(10)
 
 
 def get_exit_products():
 
-    portfolio = (
-        get_portfolio_scores()
-    )
+    portfolio = get_portfolio_scores()
 
-    return portfolio.tail(10)
+    return portfolio.sort_values(
+        "risk_score",
+        ascending=False
+    ).head(10)

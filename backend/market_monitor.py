@@ -49,10 +49,21 @@ def get_latest_market_data():
     if len(latest_data) == 0:
         return pd.DataFrame()
 
-    return pd.concat(
+    data = pd.concat(
         latest_data,
         ignore_index=True
     )
+
+    if "title" in data.columns:
+        data["product_name"] = data["title"]
+
+    if "analytics_category" in data.columns:
+        data["keyword"] = data["analytics_category"]
+
+    elif "category" in data.columns:
+        data["keyword"] = data["category"]
+
+    return data
 def get_market_summary():
 
     data = get_latest_market_data()

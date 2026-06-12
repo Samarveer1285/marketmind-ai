@@ -35,6 +35,7 @@ leaderboard = get_live_market_leaderboard()
 hidden_gems = get_live_hidden_gems()
 
 matrix = get_live_opportunity_matrix()
+matrix = matrix.loc[:, ~matrix.columns.duplicated()]
 
 opportunities = matrix.sort_values(
     "opportunity_score",
@@ -153,15 +154,12 @@ with left:
 with right:
 
     category_split = (
-        matrix["category"]
-        .value_counts()
-        .reset_index()
+        matrix[["category"]]
+        .dropna()
+        .groupby("category")
+        .size()
+        .reset_index(name="count")
     )
-
-    category_split.columns = [
-        "category",
-        "count"
-    ]
 
     donut = px.pie(
         category_split,
@@ -229,11 +227,29 @@ st.write("")
 # OPPORTUNITY EXPLORER
 # ====================================
 
+matrix["opportunity_score"] = (
+    matrix["opportunity_score"]
+    .clip(lower=1)
+)
+
+matrix = matrix.copy()
+
+matrix["opportunity_score"] = (
+    matrix["opportunity_score"]
+    .fillna(0)
+)
+
+matrix["bubble_size"] = (
+    matrix["opportunity_score"]
+    .clip(lower=0)
+    + 1
+)
+
 fig2 = px.scatter(
     matrix,
     x="review_count",
     y="rating",
-    size="opportunity_score",
+    size="bubble_size",
     color="category",
     hover_name="name"
 )

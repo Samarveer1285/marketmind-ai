@@ -1,40 +1,68 @@
-from analytics_function import *
-from opportunity_engine import *
-from category_intelligence import *
+from market_monitor import get_latest_market_data
 
 
 def get_executive_metrics():
 
-    merged = load_data()
+    data = get_latest_market_data()
 
-    total_products = (
-        merged["name"]
-        .nunique()
-    )
+    if data.empty:
+        return {
+            "Total Products": 0,
+            "Total Brands": 0,
+            "Top Growth Product": "-",
+            "Top Opportunity": "-",
+            "Highest Risk Product": "-",
+            "Top Category": "-"
+        }
 
-    total_brands = (
-        merged["brand"]
-        .nunique()
-    )
+    total_products = data["title"].nunique()
+
+    total_brands = data["brand"].nunique()
 
     top_growth_product = (
-        get_demand_momentum()
-        .iloc[0]["name"]
+        data.sort_values(
+            "review_count",
+            ascending=False
+        )
+        .iloc[0]["title"]
+    )
+
+    opportunity = data.copy()
+
+    opportunity["opportunity_score"] = (
+        opportunity["rating"] * 100
+        +
+        opportunity["review_count"] / 100
+        -
+        opportunity["price"] / 50
     )
 
     top_opportunity = (
-        get_top_opportunities()
-        .iloc[0]["name"]
+        opportunity.sort_values(
+            "opportunity_score",
+            ascending=False
+        )
+        .iloc[0]["title"]
+    )
+
+    risk = data.copy()
+
+    risk["risk_score"] = (
+        5 - risk["rating"]
     )
 
     highest_risk = (
-        get_risk_products()
-        .iloc[0]["name"]
+        risk.sort_values(
+            "risk_score",
+            ascending=False
+        )
+        .iloc[0]["title"]
     )
 
     top_category = (
-        get_category_growth()
-        .iloc[0]["category"]
+        data["category"]
+        .value_counts()
+        .index[0]
     )
 
     return {

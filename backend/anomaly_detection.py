@@ -1,127 +1,87 @@
-from analytics_function import *
-
 import pandas as pd
+
+from snapshot_history import load_snapshot_history
 
 
 def detect_price_anomalies():
 
-    merged = load_data()
+    data = load_snapshot_history()
+
+    if data.empty:
+        return pd.DataFrame()
 
     anomalies = []
 
-    for product in merged["name"].unique():
+    for product in data["title"].dropna().unique():
 
         temp = (
-            merged[
-                merged["name"] == product
-            ]
-            .sort_values(
-                "recorded_at"
-            )
+            data[data["title"] == product]
+            .sort_values("snapshot_date")
         )
 
-        temp = temp.reset_index(
-            drop=True
-        )
+        if len(temp) < 2:
+            continue
 
-        latest = (
-            temp.iloc[-1]["price"]
-        )
+        latest = temp.iloc[-1]["price"]
 
-        average = (
-            temp["price"].mean()
-        )
+        historical_avg = temp.iloc[:-1]["price"].mean()
+
+        if historical_avg == 0:
+            continue
 
         deviation = (
-            (latest - average)
-            / average
+            (latest - historical_avg)
+            / historical_avg
         ) * 100
 
-        if abs(deviation) > 10:
+        if abs(deviation) >= 10:
 
             anomalies.append({
-
-                "product":
-                    product,
-
-                "latest_price":
-                    latest,
-
-                "average_price":
-                    round(
-                        average,
-                        2
-                    ),
-
-                "deviation_pct":
-                    round(
-                        deviation,
-                        2
-                    )
+                "product": product,
+                "latest_price": latest,
+                "average_price": round(historical_avg, 2),
+                "deviation_pct": round(deviation, 2)
             })
 
-    return pd.DataFrame(
-        anomalies
-    )
-
-
+    return pd.DataFrame(anomalies)
 def detect_rating_anomalies():
 
-    merged = load_data()
+    data = load_snapshot_history()
+
+    if data.empty:
+        return pd.DataFrame()
 
     anomalies = []
 
-    for product in merged["name"].unique():
+    for product in data["title"].dropna().unique():
 
         temp = (
-            merged[
-                merged["name"] == product
-            ]
-            .sort_values(
-                "recorded_at"
-            )
+            data[data["title"] == product]
+            .sort_values("snapshot_date")
         )
 
-        temp = temp.reset_index(
-            drop=True
-        )
+        if len(temp) < 2:
+            continue
 
-        latest = (
-            temp.iloc[-1]["rating"]
-        )
+        latest = temp.iloc[-1]["rating"]
 
-        average = (
-            temp["rating"].mean()
-        )
+        historical_avg = temp.iloc[:-1]["rating"].mean()
+
+        if historical_avg == 0:
+            continue
 
         deviation = (
-            (latest - average)
-            / average
+            (latest - historical_avg)
+            / historical_avg
         ) * 100
 
-        if abs(deviation) > 8:
+        if abs(deviation) >= 8:
 
             anomalies.append({
-
-                "product":
-                    product,
-
-                "latest_rating":
-                    latest,
-
-                "average_rating":
-                    round(
-                        average,
-                        2
-                    ),
-
-                "deviation_pct":
-                    round(
-                        deviation,
-                        2
-                    )
+                "product": product,
+                "latest_rating": latest,
+                "average_rating": round(historical_avg, 2),
+                "deviation_pct": round(deviation, 2)
             })
 
-    return pd.DataFrame(
-        anomalies
-    )
+    return pd.DataFrame(anomalies)

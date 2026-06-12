@@ -112,7 +112,7 @@ with col3:
     ui_components.executive_card(
         "🏆",
         "Largest Segment",
-        f"Segment {int(largest_segment['segment'])}",
+        largest_segment["segment"],
         f"{int(largest_segment['product_count'])} products"
     )
 
@@ -122,7 +122,7 @@ with col4:
     ui_components.executive_card(
         "⭐",
         "Highest Rated",
-        f"Segment {int(highest_rated_segment['segment'])}",
+        highest_rated_segment["segment"],
         f"{highest_rated_segment['avg_rating']:.2f} rating"
     )
 
@@ -182,7 +182,7 @@ with right:
         x="price",
         y="review_count",
         color="segment",
-        size="rating",
+        size=segments["rating"].fillna(1),
         hover_name="name"
     )
 
@@ -319,8 +319,8 @@ high_engagement_segments = (
 ).sum()
 
 ui_components.ai_brief_panel([
-    f"Segment {int(largest_segment['segment'])} is the largest cluster with {int(largest_segment['product_count'])} products.",
-    f"Segment {int(highest_rated_segment['segment'])} achieves the strongest customer satisfaction at {highest_rated_segment['avg_rating']:.2f} stars.",
+    f"{largest_segment['segment']} is the largest segment with {int(largest_segment['product_count'])} products.",
+    f"{highest_rated_segment['segment']} achieves the strongest customer satisfaction at {highest_rated_segment['avg_rating']:.2f} stars.",
     f"{premium_segments} segments operate above the average pricing benchmark.",
     f"{high_engagement_segments} segments generate above-average customer engagement.",
     "Use product clusters to tailor pricing, promotions, and inventory strategies for different product archetypes.",

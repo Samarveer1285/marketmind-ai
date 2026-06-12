@@ -35,12 +35,19 @@ apply_theme()
 
 brand_health = get_live_brand_health()
 
-brand_growth = get_live_demand_momentum().rename(
-    columns={
-        "name": "brand",
-        "momentum_pct": "brand_growth_score"
-    }
+brand_growth = (
+    get_live_demand_momentum()
+    .rename(
+        columns={
+            "momentum_pct": "brand_growth_score"
+        }
+    )
 )
+
+# Keep only the columns we actually need
+brand_growth = brand_growth[
+    ["brand", "brand_growth_score"]
+]
 
 if brand_health.empty or brand_growth.empty:
     st.warning(

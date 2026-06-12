@@ -237,9 +237,21 @@ ui_components.section_header(
     "🎯",
     "Opportunity Explorer"
 )
+opportunity_plot = opportunity.copy()
 
+opportunity_plot = opportunity_plot.dropna(
+    subset=[
+        "review_count",
+        "rating",
+        "opportunity_score"
+    ]
+)
+
+opportunity_plot = opportunity_plot[
+    opportunity_plot["opportunity_score"] > 0
+]
 bubble = px.scatter(
-    opportunity,
+    opportunity_plot,
     x="review_count",
     y="rating",
     size="opportunity_score",

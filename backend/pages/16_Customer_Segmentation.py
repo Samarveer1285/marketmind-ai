@@ -91,9 +91,9 @@ with col1:
 
     ui_components.executive_card(
         "👥",
-        "Total Customers",
-        len(segments),
-        "Customers analysed"
+    "Total Personas",
+    len(segments),
+    "Personas identified"
     )
 
 
@@ -113,7 +113,7 @@ with col3:
         "🏆",
         "Largest Segment",
         largest_segment["segment_name"],
-        f"{int(largest_segment['customer_count'])} customers"
+        f"{int(largest_segment['customer_count'])} products"
     )
 
 
@@ -177,8 +177,27 @@ with left:
 
 with right:
 
+    scatter_data = segments.copy()
+
+    scatter_data["rating"] = (
+        scatter_data["rating"]
+        .fillna(3)
+    )
+
+    scatter_data["review_count"] = (
+        scatter_data["review_count"]
+        .fillna(0)
+    )
+
+    scatter_data["price"] = (
+        scatter_data["price"]
+        .fillna(
+            scatter_data["price"].median()
+        )
+    )
+
     customer_matrix = px.scatter(
-        segments,
+        scatter_data,
         x="price",
         y="review_count",
         color="segment_name",

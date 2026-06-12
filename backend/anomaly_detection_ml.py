@@ -1,53 +1,70 @@
-from analytics_function import *
+import pandas as pd
 
 from sklearn.ensemble import IsolationForest
 
-import pandas as pd
+from market_monitor import get_latest_market_data
 
 
 def detect_ml_anomalies():
 
-    merged = load_data()
+    data = get_latest_market_data()
 
-    latest = (
-        merged
-        .sort_values("recorded_at")
-        .groupby("name")
-        .tail(1)
-    )
+    if data.empty:
+        return pd.DataFrame(
+            columns=[
+                "name",
+                "price",
+                "rating",
+                "review_count",
+                "anomaly"
+            ]
+        )
 
-    data = latest[
+    df = data.copy()
+
+    df["name"] = df["product_name"]
+
+    features = df[
         [
-            "name",
             "price",
             "rating",
             "review_count"
         ]
     ].copy()
 
-    features = data[
-        [
-            "price",
-            "rating",
-            "review_count"
-        ]
-    ]
+    # Handle missing values
+    features["price"] = (
+        features["price"]
+        .fillna(
+            features["price"].median()
+        )
+    )
+
+    features["rating"] = (
+        features["rating"]
+        .fillna(3)
+    )
+
+    features["review_count"] = (
+        features["review_count"]
+        .fillna(0)
+    )
 
     model = IsolationForest(
         contamination=0.05,
         random_state=42
     )
 
-    predictions = (
-        model.fit_predict(
-            features
-        )
+    df["anomaly"] = model.fit_predict(
+        features
     )
 
-    data["anomaly"] = predictions
-
-    anomalies = data[
-        data["anomaly"] == -1
+    return df[
+        [
+            "name",
+            "price",
+            "rating",
+            "review_count",
+            "anomaly"
+        ]
     ]
-
-    return anomalies

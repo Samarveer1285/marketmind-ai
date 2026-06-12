@@ -127,12 +127,16 @@ def get_live_opportunity_matrix():
         matrix["price"] / 50
     )
 
-    return matrix.rename(
-        columns={
-            "keyword": "category",
-            "product_name": "name"
-        }
-    )
+    matrix = matrix.loc[:, ~matrix.columns.duplicated()]
+
+    if "product_name" in matrix.columns:
+        matrix = matrix.rename(
+            columns={
+                "product_name": "name"
+            }
+        )
+
+    return matrix
 def get_live_demand_momentum():
 
     data = get_latest_market_data()

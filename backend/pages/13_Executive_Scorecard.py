@@ -2,7 +2,12 @@ import streamlit as st
 import plotly.express as px
 
 from executive_scorecard import *
-from analytics_function import *
+from live_dashboard_analytics import (
+    get_live_brand_health,
+    get_live_demand_momentum,
+    get_live_market_leaderboard,
+    get_live_opportunity_matrix
+)
 
 import ui_components
 from theme import apply_theme
@@ -24,16 +29,67 @@ apply_theme()
 # LOAD DATA
 # =====================================================
 
-metrics = get_executive_metrics()
+brand_health = get_live_brand_health()
 
-brand_health = get_brand_health()
+brand_growth = get_live_demand_momentum()
 
-brand_growth = get_brand_growth()
+leaderboard = get_live_market_leaderboard()
 
-leaderboard = get_market_leaderboard()
+risk = get_live_opportunity_matrix().copy()
 
-risk = get_risk_products()
+# Risk based purely on low ratings
+risk["risk_score"] = (
+    5 - risk["rating"]
+).clip(lower=0).round(2)
 
+risk["avg_rating"] = risk["rating"]
+
+risk = risk.sort_values(
+    "risk_score",
+    ascending=False
+)
+
+latest = leaderboard.copy()
+
+metrics = {
+
+    "Total Products":
+        latest["name"].nunique(),
+
+    "Total Brands":
+        brand_health["brand"].nunique(),
+
+    "Top Growth Product":
+        (
+            brand_growth.iloc[0]["brand"]
+            if not brand_growth.empty
+            else "N/A"
+        ),
+
+    "Top Opportunity":
+        (
+            leaderboard.iloc[0]["name"]
+            if not leaderboard.empty
+            else "N/A"
+        ),
+
+    "Highest Risk Product":
+        (
+            risk.iloc[0]["name"]
+            if not risk.empty
+            else "N/A"
+        ),
+
+    "Top Category":
+        (
+            latest.iloc[0]["category"]
+            if (
+                not latest.empty
+                and "category" in latest.columns
+            )
+            else "N/A"
+        )
+}
 
 # =====================================================
 # HEADER
@@ -166,13 +222,13 @@ with right:
 
     growth_chart = px.bar(
         brand_growth.head(10).sort_values(
-            "growth_pct",
+            "momentum_pct",
             ascending=True
         ),
-        x="growth_pct",
+        x="momentum_pct",
         y="brand",
         orientation="h",
-        color="growth_pct",
+        color="momentum_pct",
         color_continuous_scale=[
             "#60A5FA",
             "#A78BFA"
@@ -248,7 +304,7 @@ with left:
 
 
 with right:
-
+    
     health_chart = px.bar(
         brand_health.head(10).sort_values(
             "brand_health_score",

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from load_products import get_latest_market_data
+from market_monitor import get_latest_market_data
 
 
 def get_live_brand_benchmark():
@@ -11,20 +11,13 @@ def get_live_brand_benchmark():
         return pd.DataFrame()
 
     benchmark = (
-        data.groupby("keyword")
+        data.groupby("brand")
         .agg(
             avg_rating=("rating", "mean"),
             total_reviews=("review_count", "sum"),
             avg_price=("price", "mean")
         )
         .reset_index()
-    )
-
-    benchmark.rename(
-        columns={
-            "keyword": "brand"
-        },
-        inplace=True
     )
 
     benchmark["benchmark_score"] = (
@@ -50,15 +43,8 @@ def get_live_category_leaders():
             "review_count",
             ascending=False
         )
-        .groupby("keyword")
+        .groupby("category")
         .head(1)
-    )
-
-    leaders = leaders.rename(
-        columns={
-            "keyword": "category",
-            "product_name": "brand"
-        }
     )
 
     return leaders[
@@ -67,4 +53,4 @@ def get_live_category_leaders():
             "brand",
             "review_count"
         ]
-    ]
+    ].reset_index(drop=True)
