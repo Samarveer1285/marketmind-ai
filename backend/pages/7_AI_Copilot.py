@@ -11,7 +11,7 @@ sys.path.append(
     )
 )
 
-import ai_copilot
+import langchain_agent
 import ui_components
 from theme import apply_theme
 
@@ -162,10 +162,9 @@ if user_prompt:
 
             try:
 
-                answer = ai_copilot.answer_question(
+                answer = langchain_agent.ask_agent(
                     user_prompt
                 )
-
             except Exception as e:
 
                 answer = (

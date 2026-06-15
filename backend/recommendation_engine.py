@@ -80,3 +80,23 @@ def generate_recommendations():
             ascending=False
         )
     )
+def get_risk_products():
+
+    demand = get_demand_momentum()
+
+    risk_products = demand.copy()
+
+    risk_products["risk_score"] = (
+        risk_products["momentum_pct"]
+        .abs()
+    )
+
+    risk_products = (
+        risk_products
+        .sort_values(
+            "risk_score",
+            ascending=False
+        )
+    )
+
+    return risk_products
