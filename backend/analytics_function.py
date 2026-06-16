@@ -406,7 +406,7 @@ def get_brand_growth():
         +
         brand_growth["avg_rating"] * 10 * 0.3
     )
-
+    
     return brand_growth.sort_values(
         by="brand_growth_score",
         ascending=False
