@@ -1,439 +1,439 @@
 # 🚀 MarketMind AI
 
-### Executive Intelligence Platform for E-commerce Decision Making
+### AI-Powered Executive Market Intelligence Platform for E-Commerce Decision Making
 
-**Predict • Detect • Simulate • Recommend • Act**
+MarketMind AI is an end-to-end executive intelligence platform designed to transform raw e-commerce product data into actionable business insights.
 
-MarketMind AI is an end-to-end executive intelligence platform designed to transform raw e-commerce data into actionable business decisions. It combines analytics, machine learning, forecasting, AI-powered insights, and decision intelligence into a unified interface built for modern business leaders.
-
-Unlike traditional dashboards that simply visualize historical trends, MarketMind enables organizations to proactively identify opportunities, monitor risks, forecast future scenarios, and simulate strategic decisions before execution.
+The platform combines automated data ingestion, advanced analytics, anomaly detection, forecasting, generative AI, and executive dashboards to help decision-makers identify opportunities, monitor risks, and optimize strategy.
 
 ---
 
-## 🎯 Problem Statement
+## 🎯 Project Objective
 
-E-commerce organizations generate massive amounts of data related to products, customer engagement, pricing, reviews, brand performance, and market trends. However, decision-makers often face several challenges:
+Traditional analytics dashboards focus on reporting historical metrics.
 
-* Information is scattered across multiple dashboards and reports.
-* Insights are reactive rather than predictive.
-* Opportunities and risks remain hidden within large datasets.
-* Strategic decisions are made without scenario testing.
-* Executives lack a unified view of market intelligence.
+MarketMind AI goes beyond reporting by enabling users to:
 
-As a result, businesses struggle to respond quickly to changing market conditions and often miss growth opportunities.
-
----
-
-## 💡 Solution
-
-MarketMind AI addresses these challenges by providing a centralized executive intelligence platform that integrates:
-
-* Market analytics,
-* Machine learning surveillance,
-* Predictive forecasting,
-* AI-assisted decision support,
-* Scenario simulation,
-* Opportunity identification, and
-* Customer and product intelligence.
-
-The platform empowers decision-makers to move beyond reporting and embrace data-driven decision intelligence.
+- Predict future trends
+- Detect anomalies automatically
+- Identify hidden opportunities
+- Benchmark competitors
+- Segment customers and products
+- Simulate strategic scenarios
+- Generate AI-powered executive briefings
 
 ---
 
-## 🌟 Key Highlights
+# ✨ Key Features
 
-* 📊 20+ integrated intelligence modules
-* 🤖 Gemini-powered AI Analyst Copilot
-* 🔮 Forecasting and predictive analytics
-* 🚨 Rule-based and ML-driven anomaly detection
-* 🎯 Opportunity identification and prioritization
-* 🎮 Scenario simulation for strategic planning
-* 👥 Customer and product segmentation
-* 📈 Executive scorecards and command centers
-* 🏆 Competitor and category intelligence
-* 🎨 Unified executive-grade user experience
+## 📈 Executive Intelligence Modules
 
-MarketMind AI transforms fragmented information into a single source of truth for executive decision-making.
-## ✨ Features
+### Market Analytics
 
-### 📋 Executive Intelligence
+- Pricing Analytics
+- Growth Analytics
+- Brand Analytics
+- Market Intelligence
+- Executive Summary
 
-Designed for leadership teams and decision-makers, MarketMind provides a unified view of business performance.
+### Predictive Intelligence
 
-* Executive Home Dashboard
-* Executive Summary
-* Executive KPI Scorecard
-* Executive Command Center
+- Forecasting
+- Forecasting V2
+- Portfolio Optimizer
+- Scenario Simulator
 
----
+### Opportunity Discovery
 
-### 🧠 Market Intelligence
+- Opportunity Scoring
+- Product Segmentation
+- Hidden Gems Detection
 
-Understand the competitive landscape and uncover hidden opportunities.
+### Risk & Monitoring
 
-* Pricing Analytics
-* Growth Analytics
-* Brand Analytics
-* Market Intelligence
-* Category Intelligence
-* Competitor Benchmarking
-* Opportunity Scoring
+- Anomaly Detection
+- ML Anomaly Detection
+- Market Alerts
 
----
+### Strategic Intelligence
 
-### 🔮 Predictive Intelligence
+- Competitor Benchmarking
+- Executive Scorecard
+- Category Intelligence
 
-Anticipate future trends before they impact the business.
+### Customer Intelligence
 
-* Forecasting Engine
-* Demand Trend Analysis
-* Future Review Forecasting
-* Price Forecasting
+- Customer Segmentation
+
+### Generative AI
+
+- AI Analyst Copilot
+- Executive Briefings
+- Natural Language Market Queries
 
 ---
 
-### 🎯 Decision Intelligence
+# 🧠 AI Analyst Copilot
 
-Evaluate strategic actions before implementation.
+MarketMind AI integrates Gemini and LangChain to enable conversational market intelligence.
 
-* Portfolio Optimizer
-* Scenario Simulator
-* Opportunity Engine
-* Recommendation Engine
+Users can ask questions such as:
 
----
+- Which products have the highest risk and why?
+- What categories show the strongest growth momentum?
+- Which hidden gems should executives prioritize?
+- Summarize this week's market intelligence.
+- What products represent the biggest opportunities?
 
-### 🤖 AI Intelligence
-
-Leverage Generative AI for executive decision support.
-
-* Gemini-Powered AI Analyst Copilot
-* Natural Language Question Answering
-* Contextual Business Recommendations
+The Copilot converts analytics outputs into executive-ready insights.
 
 ---
 
-### 🚨 Monitoring & Risk Management
+# 🔄 Automated Data Pipeline
 
-Continuously monitor the market for emerging risks and unusual behaviour.
+MarketMind AI continuously refreshes market snapshots using automated ingestion workflows.
 
-* Rule-Based Anomaly Detection
-* ML-Based Anomaly Detection
-* Market Alert Center
-* Executive Risk Briefs
+## Data Sources
+
+- Flipkart Product Listings
+- Apify Scraping Actor
+
+## Pipeline Flow
+
+Flipkart Listings
+
+↓
+
+Apify Actor
+
+↓
+
+daily_ingestion.py
+
+↓
+
+Historical CSV Snapshots
+
+↓
+
+Analytics Engine
+
+↓
+
+AI Layer
+
+↓
+
+Executive Dashboards
 
 ---
 
-### 👥 Segmentation Intelligence
+# ⏰ Automation
 
-Understand both products and customers at a deeper level.
+## Windows Task Scheduler (Implemented)
 
-* Customer Segmentation
-* Product Segmentation
-* Persona Discovery
-* Segment Profiling
+Development automation is executed using Windows Task Scheduler.
+
+Configured schedule:
+
+- Every Monday at 10:00 AM
+- Every Thursday at 10:00 AM
+
+Responsibilities:
+
+- Execute snapshot refresh
+- Generate category snapshots
+- Update historical repository
+- Refresh MarketMind analytics
 
 ---
 
-## 🏗 System Architecture
+## n8n Workflow (Documented)
 
-MarketMind follows a layered executive intelligence architecture:
+A conceptual n8n production workflow was designed to illustrate enterprise deployment architecture.
 
-```text
-                ┌─────────────────────┐
-                │   Data Sources      │
-                │  (Current Dataset)  │
-                │ Flipkart (Planned)  │
-                └──────────┬──────────┘
-                           ↓
-                ┌─────────────────────┐
-                │ Analytics Engines   │
-                │ Pricing • Growth    │
-                │ Brand • Category    │
-                └──────────┬──────────┘
-                           ↓
-                ┌─────────────────────┐
-                │ Machine Learning    │
-                │ Forecasting         │
-                │ Segmentation        │
-                │ Anomaly Detection   │
-                └──────────┬──────────┘
-                           ↓
-                ┌─────────────────────┐
-                │ Gemini AI Copilot   │
-                │ Decision Support    │
-                └──────────┬──────────┘
-                           ↓
-                ┌─────────────────────┐
-                │ Executive Dashboards│
-                │ Alerts & Insights   │
-                └──────────┬──────────┘
-                           ↓
-                ┌─────────────────────┐
-                │ Business Decisions  │
-                └─────────────────────┘
+Workflow:
 
-## 🏗 Architecture Diagram
+Schedule Trigger
+
+↓
+
+Invoke daily_ingestion.py
+
+↓
+
+Generate Category Snapshots
+
+↓
+
+Refresh MarketMind Analytics
+
+---
+
+# 🏗️ System Architecture
 
 ![MarketMind Architecture](architecture/MarketMind_Architecture.png)
+
+The architecture integrates:
+
+- Automated ingestion pipelines
+- Historical snapshot storage
+- Executive analytics modules
+- Gemini-powered AI layer
+- Streamlit dashboards
+- Business decision support workflows
+
+---
+
+# 📸 Screenshots
+
+## Dashboard
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+---
+
+## Market Intelligence
+
+![Market Intelligence](docs/screenshots/market_intelligence.png)
+
+---
+
+## AI Analyst Copilot
+
+![AI Copilot](docs/screenshots/ai_copilot.png)
+
+---
+
+## Windows Task Scheduler Automation
+
+![Task Scheduler](docs/screenshots/task_scheduler.png)
+
+---
+
+## n8n Workflow Documentation
+
+![n8n Workflow](docs/screenshots/n8n_workflow.png)
+
+---
+
+# 📂 Project Structure
+
+```
+MarketMind AI
+│
+├── analytics/
+│   ├── charts/
+│   └── reports/
+│
+├── architecture/
+│   ├── MarketMind_Architecture.drawio
+│   └── MarketMind_Architecture.png
+│
+├── backend/
+│   ├── dashboard.py
+│   ├── analytics_engine.py
+│   ├── ai_copilot.py
+│   ├── daily_ingestion.py
+│   └── pages/
+│
+├── docs/
+│   └── screenshots/
+│
+├── pipelines/
+│   ├── ingestion_pipeline.py
+│   ├── flipkart_pipeline.py
+│   └── snapshots/
+│
+├── providers/
+│
+├── refresh_snapshots.bat
+│
+└── README.md
 ```
 
 ---
 
-## 🛠 Technology Stack
+# ⚙️ Installation
 
-### Frontend
-
-* Streamlit
-* Plotly
-
-### Backend
-
-* Python
-* Pandas
-* NumPy
-
-### Machine Learning
-
-* Scikit-Learn
-
-### Artificial Intelligence
-
-* Google Gemini 2.5 Flash
-
-### Data Processing
-
-* Python Data Pipelines
-* Custom Analytics Engines
-
-### Visualization
-
-* Plotly Express
-* Executive UI Components
-
----
-
-## 📂 Project Structure
-
-```text
-MarketMind/
-│
-├── README.md
-├── requirements.txt
-├── .gitignore
-│
-└── backend/
-    │
-    ├── dashboard.py
-    ├── theme.py
-    ├── ui_components.py
-    ├── ai_copilot.py
-    │
-    ├── analytics_function.py
-    ├── forecasting.py
-    ├── recommendation_engine.py
-    ├── opportunity_engine.py
-    ├── executive_scorecard.py
-    ├── category_intelligence.py
-    ├── competitor_benchmark.py
-    ├── portfolio_optimizer.py
-    ├── customer_segmentation.py
-    ├── product_segmentation.py
-    ├── anomaly_detection.py
-    ├── anomaly_detection_ml.py
-    ├── market_alerts.py
-    ├── scenario_simulator.py
-    │
-    └── pages/
-        ├── Pricing Analytics
-        ├── Growth Analytics
-        ├── Brand Analytics
-        ├── Market Intelligence
-        ├── Executive Summary
-        ├── Forecasting Engine
-        ├── AI Copilot
-        ├── Category Intelligence
-        ├── Portfolio Optimizer
-        ├── Anomaly Detection
-        ├── Opportunity Scoring
-        ├── Competitor Benchmarking
-        ├── Executive Scorecard
-        ├── Product Segmentation
-        ├── Scenario Simulator
-        ├── Customer Segmentation
-        ├── ML Anomaly Detection
-        ├── Market Alerts
-        └── Executive Command Center
-```
-## ⚙️ Installation & Setup
-
-### Clone the Repository
+## Clone Repository
 
 ```bash
-git clone https://github.com/<your-username>/MarketMind.git
-cd MarketMind
+git clone https://github.com/Samarveer1285/marketmind-ai.git
+cd marketmind-ai
 ```
 
-### Create a Virtual Environment (Optional but Recommended)
+---
 
-#### Windows
+## Create Virtual Environment
 
 ```bash
 python -m venv venv
+```
+
+Activate:
+
+### Windows
+
+```bash
 venv\Scripts\activate
 ```
 
-#### macOS / Linux
+---
 
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### Install Dependencies
+## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Configure Environment Variables
+---
 
-Create a `.env` file in the project root:
+# 🔐 Environment Variables
+
+Create a `.env` file:
 
 ```env
-GEMINI_API_KEY=your_api_key_here
+APIFY_TOKEN=your_apify_token
+ACTOR_ID=your_apify_actor_id
+GEMINI_API_KEY=your_gemini_api_key
 ```
-
-> **Note:** Never commit your API keys to GitHub.
 
 ---
 
-## ▶️ Running the Application
+# ▶️ Running MarketMind AI
 
-Launch MarketMind using:
+Launch Streamlit:
 
 ```bash
 streamlit run backend/dashboard.py
 ```
 
-The application will open in your browser, typically at:
+Open:
 
-```text
+```
 http://localhost:8501
 ```
 
 ---
 
-## 📸 Screenshots
+# 🔄 Refreshing Market Snapshots
 
-The following screenshots can be added to showcase the platform:
+Manual refresh:
 
-### 🏠 MarketMind Home
+```bash
+python backend/daily_ingestion.py
+```
 
-* Executive Snapshot
-* Market Performance
-* Opportunity Explorer
+OR
 
-### 🎯 Executive Command Center
+Execute:
 
-* Alerts
-* Risks
-* Opportunities
-* Forecasts
+```bash
+refresh_snapshots.bat
+```
 
-### 🤖 AI Analyst Copilot
-
-* Natural language business insights
-* Gemini-powered recommendations
-
-### 🎮 Scenario Simulator
-
-* Pricing simulations
-* Rating improvement analysis
-* Marketing growth impact
-
-### 🚨 ML Surveillance
-
-* Anomaly detection
-* Product surveillance matrix
-
-> Add screenshots inside a `screenshots/` folder and reference them here.
+Automation is handled by Windows Task Scheduler.
 
 ---
 
-## 🔮 Future Scope
+# 📊 Historical Snapshot Repository
 
-MarketMind is designed as an extensible executive intelligence platform.
+MarketMind maintains historical category snapshots for trend analysis.
 
-### 📡 Live Data Integration
+Categories include:
 
-Planned enhancements include:
+- Smartphones
+- Gaming Laptops
+- Tablets
+- Bluetooth Speakers
+- Computer Monitors
+- Headphones
+- Smartwatches
+- Televisions
+- Cameras
+- Power Banks
 
-* Flipkart Integration
-* Automated Data Ingestion Pipeline
-* Real-Time Market Updates
+Snapshots enable:
 
-### 🤖 Advanced AI Capabilities
-
-Future AI enhancements include:
-
-* LangChain Agent
-* Tool Calling
-* Context-Aware AI Assistance
-
-### 🔔 Automation
-
-Operational intelligence enhancements:
-
-* Scheduled Executive Reports
-* Automated Alert Delivery
-* n8n Workflow Integration
-
-### 📊 Data Intelligence
-
-Advanced analytical capabilities:
-
-* Automated Exploratory Data Analysis (EDA)
-* Data Profiling
-* Retrieval-Augmented Generation (RAG) Assistant
+- Trend tracking
+- Growth analysis
+- Forecasting
+- Opportunity detection
+- Risk monitoring
 
 ---
 
-## 👨‍💻 Author
+# 🛠️ Technology Stack
+
+## Frontend
+
+- Streamlit
+
+## Backend
+
+- Python
+
+## Data Processing
+
+- Pandas
+- NumPy
+
+## Visualization
+
+- Plotly
+- Matplotlib
+
+## Machine Learning
+
+- Scikit-learn
+
+## Forecasting
+
+- Statistical Forecasting Models
+
+## Generative AI
+
+- Gemini
+- LangChain
+
+## Automation
+
+- Windows Task Scheduler
+- n8n (Conceptual Workflow)
+
+## Data Acquisition
+
+- Apify
+- Flipkart
+
+## Version Control
+
+- Git
+- GitHub
+
+---
+
+# 🚀 Future Enhancements
+
+Potential future improvements include:
+
+- Cloud deployment
+- Docker containerization
+- CI/CD pipelines
+- Production n8n execution
+- Multi-marketplace intelligence
+- Real-time streaming ingestion
+- Role-based access control
+
+---
+
+# 👨‍💻 Author
 
 **Samarveer Thakur**
 
-Built as an end-to-end executive intelligence platform demonstrating the integration of analytics, machine learning, forecasting, AI, and decision intelligence for e-commerce use cases.
+Built as an executive intelligence platform demonstrating the integration of analytics, machine learning, automation, and generative AI for strategic decision-making.
 
 ---
 
-## 🙏 Acknowledgements
-
-This project leverages several open-source technologies and APIs, including:
-
-* Streamlit
-* Plotly
-* Pandas
-* NumPy
-* Scikit-Learn
-* Google Gemini
-
-Special thanks to the developer communities that make rapid experimentation and innovation possible.
-
----
-
-## ⭐ Support
-
-If you found this project interesting or useful:
-
-* Consider starring the repository.
-* Share feedback and suggestions.
-* Connect for discussions around analytics, machine learning, and AI-driven decision systems.
-
----
-
-# MarketMind AI
-
-### Predict • Detect • Simulate • Recommend • Act
-
-Transforming data into executive decisions.
+## ⭐ If you found this project interesting, consider starring the repository.
