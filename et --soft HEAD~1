@@ -1,0 +1,22 @@
+[1mdiff --git a/backend/daily_ingestion.py b/backend/daily_ingestion.py[m
+[1mindex a8cc781..7e23f5d 100644[m
+[1m--- a/backend/daily_ingestion.py[m
+[1m+++ b/backend/daily_ingestion.py[m
+[36m@@ -4,11 +4,14 @@[m [mimport os[m
+ from datetime import datetime[m
+ [m
+ [m
+[31m-APIFY_TOKEN = "REMOVED_SECRET"[m
+[32m+[m[32mfrom dotenv import load_dotenv[m
+ [m
+[31m-ACTOR_ID = "TBFjma2NhVb30QONt"[m
+[32m+[m[32mload_dotenv()[m
+ [m
+[31m-MAX_PRODUCTS = 20[m
+[32m+[m[32mAPIFY_TOKEN = os.getenv("APIFY_TOKEN")[m
+[32m+[m[32mACTOR_ID = os.getenv("ACTOR_ID")[m
+[32m+[m
+[32m+[m[32mMAX_PRODUCTS = 50[m
+ [m
+ [m
+ CATEGORY_URLS = {[m

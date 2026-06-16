@@ -175,7 +175,7 @@ MarketMind follows a layered executive intelligence architecture:
 
 ## 🏗 Architecture Diagram
 
-![MarketMind Architecture](architecture/architecture.png)
+![MarketMind Architecture](architecture/MarketMind_Architecture.png)
 ```
 
 ---
