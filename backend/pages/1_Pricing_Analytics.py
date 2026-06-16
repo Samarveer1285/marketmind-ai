@@ -263,6 +263,13 @@ scatter_data["bubble_size"] = (
     + 1
 )
 
+scatter_data["bubble_size"] = (
+    scatter_data["bubble_size"]
+    .fillna(1)
+    .astype(float)
+    .clip(lower=1)
+)
+
 value_scatter = px.scatter(
     scatter_data,
     x="price",

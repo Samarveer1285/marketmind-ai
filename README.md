@@ -1,3 +1,8 @@
+## Live Demo
+
+https://marketmind-ai-samar.streamlit.app
+
+Explore the deployed executive intelligence platform here.
 # 🚀 MarketMind AI
 
 ### AI-Powered Executive Market Intelligence Platform for E-Commerce Decision Making
