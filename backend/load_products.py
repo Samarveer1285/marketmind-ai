@@ -26,9 +26,9 @@ def get_latest_market_data():
 
         filename = os.path.basename(file)
 
-        parts = filename.replace(".csv", "").split("_")
+        name = filename.replace(".csv", "")
 
-        keyword = "_".join(parts[3:])
+        keyword = name.split("_", 1)[1]
 
         latest_files[keyword] = file
 
