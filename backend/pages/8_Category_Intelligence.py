@@ -52,6 +52,14 @@ category_summary = growth.merge(
     how="left"
 )
 
+if category_summary.empty:
+    st.info(
+        "Category growth needs at least two snapshot dates to compare "
+        "against each other -- check back after the next scheduled "
+        "ingestion run."
+    )
+    st.stop()
+
 
 # =====================================================
 # TOP INSIGHTS

@@ -30,6 +30,7 @@ def compare_forecasting_models():
             .sort_values(
                 "recorded_at"
             )
+            .dropna(subset=["review_count"])
         )
 
         if len(temp) < 10:

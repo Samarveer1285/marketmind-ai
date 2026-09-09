@@ -1,0 +1,12 @@
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+
+[client]
+# Hide raw tracebacks/exception details from viewers of the deployed app --
+# Streamlit still shows the generic "something went wrong" box, and full
+# tracebacks still go to server-side logs (visible to us on Streamlit Cloud's
+# own logs panel), just not to visitors. Covers all 20+ pages uniformly
+# instead of hand-wrapping each one in try/except.
+showErrorDetails = "none"

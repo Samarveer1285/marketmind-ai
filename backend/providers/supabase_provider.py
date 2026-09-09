@@ -148,3 +148,23 @@ class SupabaseProvider(DataProvider):
             return self._fetch_all(build_query)
         except Exception as exc:
             raise ProviderError(f"Could not query {TABLE_NAME}: {exc}") from exc
+
+    def get_last_refreshed(self):
+        client = self._get_client()
+
+        try:
+            resp = (
+                client.table(TABLE_NAME)
+                .select("fetched_at")
+                .order("fetched_at", desc=True)
+                .limit(1)
+                .execute()
+            )
+        except Exception as exc:
+            raise ProviderError(f"Could not query {TABLE_NAME}: {exc}") from exc
+
+        rows = resp.data or []
+        if not rows:
+            return None
+
+        return datetime.fromisoformat(rows[0]["fetched_at"].replace("Z", "+00:00"))

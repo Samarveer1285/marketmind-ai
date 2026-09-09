@@ -1,6 +1,8 @@
 import streamlit as st
 import plotly.io as pio
 
+import ui_components
+
 
 def apply_theme():
 
@@ -90,3 +92,5 @@ def apply_theme():
     """, unsafe_allow_html=True)
 
     pio.templates.default = "plotly_dark"
+
+    ui_components.render_freshness_badge()

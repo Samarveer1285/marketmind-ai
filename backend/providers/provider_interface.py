@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from datetime import datetime
+
 import pandas as pd
 
 
@@ -37,5 +39,14 @@ class DataProvider(ABC):
         days : int | None
             If given, only return rows whose snapshot_date is within the last
             `days` days. If None, return the full available history.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_last_refreshed(self) -> datetime | None:
+        """
+        Timestamp of the most recent ingestion run (max fetched_at across
+        every row), or None if there's no data yet. Powers the "data last
+        refreshed" indicator shown on every page.
         """
         raise NotImplementedError
