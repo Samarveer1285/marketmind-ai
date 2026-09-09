@@ -7,7 +7,10 @@ def get_portfolio_scores():
     data = get_latest_market_data()
 
     if data.empty:
-        return pd.DataFrame()
+        return pd.DataFrame(columns=[
+            "name", "rating", "review_count", "price",
+            "momentum_pct", "risk_score", "portfolio_score",
+        ])
 
     portfolio = data.copy()
 

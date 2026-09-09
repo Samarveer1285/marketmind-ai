@@ -1,53 +1,21 @@
-import pandas as pd
-import os
-import glob
-
-
-SNAPSHOT_DIR = os.path.join(
-    os.path.dirname(__file__),
-    "..",
-    "pipelines",
-    "snapshots"
-)
+from providers import get_provider
 
 
 def get_latest_market_data():
+    """
+    Each category's most recent snapshot only (not full history) — matches
+    this function's original intent. Previously this glob'd CSV filenames and
+    picked whichever file glob.glob() happened to return last per keyword,
+    which wasn't reliably the most recent date; the provider's
+    get_latest_snapshot() fixes that by actually comparing snapshot_date.
+    """
+    data = get_provider().get_latest_snapshot()
 
-    csv_files = glob.glob(
-        os.path.join(SNAPSHOT_DIR, "*.csv")
-    )
+    if data.empty:
+        return data
 
-    if not csv_files:
-        return pd.DataFrame()
+    if "fetched_at" in data.columns:
+        print("Latest Fetch Time:", data["fetched_at"].max())
+    print("Total Products:", len(data))
 
-    latest_files = {}
-
-    for file in csv_files:
-
-        filename = os.path.basename(file)
-
-        name = filename.replace(".csv", "")
-
-        keyword = name.split("_", 1)[1]
-
-        latest_files[keyword] = file
-
-    frames = []
-
-    for file in latest_files.values():
-
-        try:
-            df = pd.read_csv(file)
-
-            frames.append(df)
-
-        except Exception:
-            pass
-
-    if not frames:
-        return pd.DataFrame()
-
-    return pd.concat(
-        frames,
-        ignore_index=True
-    )
+    return data
