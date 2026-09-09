@@ -122,3 +122,6 @@ class MockProvider(DataProvider):
             rows.extend(self._generate(today - timedelta(days=offset)))
 
         return pd.DataFrame(rows)
+
+    def get_last_refreshed(self):
+        return datetime.now(timezone.utc)

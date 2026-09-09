@@ -17,7 +17,13 @@ def forecast_reviews():
                 merged["name"] == product
             ]
             .sort_values("recorded_at")
+            .dropna(subset=["review_count"])
         )
+
+        if temp.empty:
+            # This product has never had a non-null review_count (~21-23% of
+            # scraped rows are missing it) -- nothing to fit a trend on.
+            continue
 
         temp = temp.reset_index(drop=True)
 
@@ -59,7 +65,11 @@ def forecast_price():
                 merged["name"] == product
             ]
             .sort_values("recorded_at")
+            .dropna(subset=["price"])
         )
+
+        if temp.empty:
+            continue
 
         temp = temp.reset_index(drop=True)
 

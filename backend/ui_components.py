@@ -1,4 +1,62 @@
+from datetime import datetime, timezone
+
 import streamlit as st
+
+from providers import get_provider
+
+# Automated ingestion runs twice weekly (Monday & Thursday) -- see
+# .github/workflows/refresh_data.yml. The longest gap on schedule is 4 days
+# (Thu -> Mon), so that's "on time"; beyond that the badge starts warning
+# that a scheduled run was likely missed.
+FRESHNESS_OK_HOURS = 4 * 24
+FRESHNESS_WARN_HOURS = 8 * 24
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def _cached_last_refreshed():
+    """Cached for 5 minutes so every page load doesn't re-query Supabase --
+    this is called from apply_theme(), i.e. once per page per rerun."""
+    return get_provider().get_last_refreshed()
+
+
+def render_freshness_badge():
+    """
+    "Data last refreshed" indicator, shown in the sidebar on every page (see
+    theme.py's apply_theme(), which calls this). Pulled from the real
+    provider, not hardcoded -- if the automation stops running, this
+    genuinely goes stale/red instead of silently claiming to be live.
+    """
+    try:
+        last_refreshed = _cached_last_refreshed()
+    except Exception as e:
+        st.sidebar.caption(f"⚪ Data freshness unknown ({e})")
+        return
+
+    if last_refreshed is None:
+        st.sidebar.caption("⚪ No data ingested yet")
+        return
+
+    if last_refreshed.tzinfo is None:
+        last_refreshed = last_refreshed.replace(tzinfo=timezone.utc)
+
+    age_hours = (datetime.now(timezone.utc) - last_refreshed).total_seconds() / 3600
+
+    if age_hours <= FRESHNESS_OK_HOURS:
+        dot = "🟢"
+    elif age_hours <= FRESHNESS_WARN_HOURS:
+        dot = "🟡"
+    else:
+        dot = "🔴"
+
+    age_label = (
+        f"{age_hours / 24:.1f} days ago" if age_hours >= 24
+        else f"{age_hours:.1f} hours ago"
+    )
+
+    st.sidebar.caption(
+        f"{dot} Data last refreshed: "
+        f"{last_refreshed.strftime('%Y-%m-%d %H:%M UTC')} ({age_label})"
+    )
 
 
 def render_hero():

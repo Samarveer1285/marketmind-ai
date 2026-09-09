@@ -71,6 +71,18 @@ def generate_live_forecast(product_name):
 
     current_reviews = history.iloc[-1]["review_count"]
 
+    if pd.isna(current_reviews):
+        # review_count is null for ~21-23% of scraped rows -- if this
+        # product's latest snapshot is one of them, there's nothing to
+        # forecast from.
+        return {
+            "status": "No Data",
+            "current_value": None,
+            "forecast_value": None,
+            "confidence": "Low",
+            "trend": "Unknown"
+        }
+
     n_days = len(history)
 
     # Only 1 day available
@@ -86,6 +98,17 @@ def generate_live_forecast(product_name):
 
     # Simple trend forecast
     previous_reviews = history.iloc[-2]["review_count"]
+
+    if pd.isna(previous_reviews):
+        # Same idea, one snapshot back -- fall back to treating today's
+        # value as the whole (short) history rather than crashing.
+        return {
+            "status": "Insufficient History",
+            "current_value": int(current_reviews),
+            "forecast_value": int(current_reviews),
+            "confidence": "Low",
+            "trend": "Stable"
+        }
 
     growth = current_reviews - previous_reviews
 
