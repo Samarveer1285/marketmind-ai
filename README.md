@@ -113,13 +113,13 @@ Apify Actor
 
 ↓
 
-daily_ingestion.py
+daily_ingestion.py (runs on GitHub Actions, not a personal PC)
 
 ↓
 
-Historical CSV Snapshots
+Supabase (`flipkart_snapshots` table) — single source of truth, read by every page
 
-↓
+↓ (local CSV backup written alongside, for audit/debugging only)
 
 Analytics Engine
 
@@ -135,29 +135,35 @@ Executive Dashboards
 
 # ⏰ Automation
 
-## Windows Task Scheduler (Implemented)
+## GitHub Actions (Implemented)
 
-Development automation is executed using Windows Task Scheduler.
+Ingestion runs on GitHub's own cloud runners via [`.github/workflows/refresh_data.yml`](.github/workflows/refresh_data.yml) — not on a personal PC, so it keeps running (and keeps Supabase, and therefore the deployed app, live) whether or not anyone's machine is on.
 
 Configured schedule:
 
-- Every Monday at 10:00 AM
-- Every Thursday at 10:00 AM
+- Every Monday at 03:00 UTC
+- Every Thursday at 03:00 UTC
+
+Plus a manual `workflow_dispatch` trigger from the Actions tab for on-demand runs.
 
 Responsibilities:
 
-- Execute snapshot refresh
-- Generate category snapshots
-- Update historical repository
-- Refresh MarketMind analytics
+- Scrape every category via the Apify actor
+- Upsert results into Supabase (`flipkart_snapshots`), keyed on `(item_id, snapshot_date)` so re-runs update rather than duplicate
+- Write a local CSV backup and upload it as a short-lived build artifact
+- Exit non-zero (visible as a failed run) if every category fails, rather than silently "succeeding" with no data
+
+Requires `APIFY_TOKEN`, `ACTOR_ID`, `SUPABASE_URL`, `SUPABASE_KEY` as GitHub Actions repository secrets.
+
+`refresh_snapshots.bat` (Windows Task Scheduler) still works as a manual local trigger for development, but is no longer the thing anything actually depends on for live data — see [Refreshing Market Snapshots](#-refreshing-market-snapshots) below.
 
 ---
 
-## n8n Workflow (Documented)
+## n8n Workflow (Early Design Exploration)
 
-A conceptual n8n production workflow was designed to illustrate enterprise deployment architecture.
+Before settling on GitHub Actions, a conceptual n8n workflow was sketched out to explore what a fully-managed automation platform would look like for this pipeline. It was never wired up to anything and isn't part of the running system — kept here as a record of an alternative considered, not a currently-active path.
 
-Workflow:
+Workflow (as designed, never implemented):
 
 Schedule Trigger
 
@@ -227,6 +233,10 @@ The architecture integrates:
 ```
 MarketMind AI
 │
+├── .github/
+│   └── workflows/
+│       └── refresh_data.yml   -- scheduled + manual ingestion (see Automation)
+│
 ├── analytics/
 │   ├── charts/
 │   └── reports/
@@ -237,22 +247,21 @@ MarketMind AI
 │
 ├── backend/
 │   ├── dashboard.py
-│   ├── analytics_engine.py
 │   ├── ai_copilot.py
-│   ├── daily_ingestion.py
+│   ├── daily_ingestion.py     -- scrapes via Apify, upserts into Supabase
+│   ├── providers/             -- shared data-access layer (mock + supabase)
 │   └── pages/
+│
+├── db/
+│   └── schema.sql             -- Supabase schema (flipkart_snapshots table)
 │
 ├── docs/
 │   └── screenshots/
 │
 ├── pipelines/
-│   ├── ingestion_pipeline.py
-│   ├── flipkart_pipeline.py
-│   └── snapshots/
+│   └── snapshots/             -- local CSV backups written by each ingestion run
 │
-├── providers/
-│
-├── refresh_snapshots.bat
+├── refresh_snapshots.bat      -- manual local trigger (dev only, see Automation)
 │
 └── README.md
 ```
@@ -302,7 +311,11 @@ Create a `.env` file:
 APIFY_TOKEN=your_apify_token
 ACTOR_ID=your_apify_actor_id
 GEMINI_API_KEY=your_gemini_api_key
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_KEY=your_supabase_key
 ```
+
+`SUPABASE_URL`/`SUPABASE_KEY` are required for the app to read live data (via `providers/`) and for `daily_ingestion.py` to write it. `APIFY_TOKEN`/`ACTOR_ID` are only needed to run ingestion itself, not to browse the dashboard. The same four values need to also be set as GitHub Actions repository secrets (Settings → Secrets and variables → Actions) for the scheduled workflow, and as Streamlit Cloud "Secrets" (`SUPABASE_URL`/`SUPABASE_KEY`/`GEMINI_API_KEY` only) for the deployed app -- three separate secret stores that all need matching values.
 
 ---
 
@@ -324,7 +337,9 @@ http://localhost:8501
 
 # 🔄 Refreshing Market Snapshots
 
-Manual refresh:
+Live data refreshes automatically, twice weekly, via [GitHub Actions](#-automation) — no manual step is needed for the deployed app to stay current.
+
+For a manual/local run (e.g. during development):
 
 ```bash
 python backend/daily_ingestion.py
@@ -332,19 +347,17 @@ python backend/daily_ingestion.py
 
 OR
 
-Execute:
-
 ```bash
 refresh_snapshots.bat
 ```
 
-Automation is handled by Windows Task Scheduler.
+Either way, results are upserted into Supabase (read by every page) and a local CSV backup is written to `pipelines/snapshots/`.
 
 ---
 
 # 📊 Historical Snapshot Repository
 
-MarketMind maintains historical category snapshots for trend analysis.
+MarketMind maintains historical category snapshots for trend analysis, stored in Supabase (`flipkart_snapshots`) and read by every page through the shared `providers/` layer.
 
 Categories include:
 
@@ -402,10 +415,13 @@ Snapshots enable:
 - Gemini
 - LangChain
 
+## Database
+
+- Supabase (Postgres)
+
 ## Automation
 
-- Windows Task Scheduler
-- n8n (Conceptual Workflow)
+- GitHub Actions (scheduled + manually-triggered ingestion)
 
 ## Data Acquisition
 
