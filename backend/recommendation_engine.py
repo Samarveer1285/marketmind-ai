@@ -22,6 +22,11 @@ def generate_recommendations():
             forecast["product"] == product
         ]
 
+        if price_row.empty:
+            # No forecast for this product (e.g. it wasn't present in the
+            # latest price data) -- skip rather than crash the whole page.
+            continue
+
         future_price = (
             price_row["forecast_price"]
             .values[0]
@@ -68,6 +73,11 @@ def generate_recommendations():
             "recommendation":
                 action
         })
+
+    if not recommendations:
+        return pd.DataFrame(columns=[
+            "product", "momentum", "forecast_price", "priority_score", "recommendation",
+        ])
 
     recommendations_df = pd.DataFrame(
         recommendations

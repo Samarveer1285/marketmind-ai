@@ -6,16 +6,21 @@ def get_category_growth():
 
     merged = load_data()
 
+    unique_dates = merged["recorded_at"].sort_values().unique()
+
+    if len(unique_dates) < 2:
+        # Need at least two distinct snapshot dates to compare growth against
+        # (e.g. no data yet, or only one ingestion run so far).
+        return pd.DataFrame(columns=[
+            "category", "review_count_latest", "review_count_previous", "growth_pct",
+        ])
+
     latest_date = (
         merged["recorded_at"]
         .max()
     )
 
-    previous_date = (
-        merged["recorded_at"]
-        .sort_values()
-        .unique()[-2]
-    )
+    previous_date = unique_dates[-2]
 
     latest = merged[
         merged["recorded_at"] == latest_date

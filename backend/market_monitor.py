@@ -1,58 +1,21 @@
-import os
 import pandas as pd
 
-BASE_DIR = os.path.dirname(
-    os.path.dirname(
-        os.path.abspath(__file__)
-    )
-)
-
-SNAPSHOT_DIR = os.path.join(
-    BASE_DIR,
-    "pipelines",
-    "snapshots"
-)
+from providers import get_provider
 
 
 def get_latest_market_data():
+    """
+    Despite the name, this has always returned the FULL available history
+    (every snapshot_date, every category) concatenated together, not just the
+    latest snapshot — kept as-is here since 11 downstream modules
+    (live_dashboard_analytics, live_forecasting, product_segmentation, etc.)
+    rely on that full-history shape for trend/momentum calculations. Data now
+    comes from the shared Supabase-backed provider instead of a raw CSV glob.
+    """
+    data = get_provider().get_historical_snapshots()
 
-    if not os.path.exists(SNAPSHOT_DIR):
-        return pd.DataFrame()
-
-    files = [
-        f
-        for f in os.listdir(SNAPSHOT_DIR)
-        if f.endswith(".csv")
-    ]
-
-    if len(files) == 0:
-        return pd.DataFrame()
-
-    latest_data = []
-
-    for file in files:
-
-        path = os.path.join(
-            SNAPSHOT_DIR,
-            file
-        )
-
-        try:
-
-            df = pd.read_csv(path)
-
-            latest_data.append(df)
-
-        except:
-            pass
-
-    if len(latest_data) == 0:
-        return pd.DataFrame()
-
-    data = pd.concat(
-        latest_data,
-        ignore_index=True
-    )
+    if data.empty:
+        return data
 
     if "title" in data.columns:
         data["product_name"] = data["title"]
@@ -64,6 +27,8 @@ def get_latest_market_data():
         data["keyword"] = data["category"]
 
     return data
+
+
 def get_market_summary():
 
     data = get_latest_market_data()

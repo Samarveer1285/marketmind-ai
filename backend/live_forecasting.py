@@ -1,54 +1,32 @@
-import os
 import pandas as pd
-from pathlib import Path
 
-SNAPSHOT_DIR = Path("pipelines/snapshots")
+from providers import get_provider
 
 
 def build_historical_timeseries():
+    """
+    Full snapshot history, shaped for the forecasting functions below
+    (product_name, snapshot_date as a real date). Previously this read
+    pipelines/snapshots/*.csv directly and referenced "timestamp" and
+    "product_name" columns that don't actually exist in the real CSVs (only
+    "fetched_at" and "title" do) — meaning this was silently broken against
+    real data. Now sourced from the shared provider and renamed correctly.
+    """
+    history = get_provider().get_historical_snapshots()
 
-    all_records = []
+    if history.empty:
+        return history
 
-    if not SNAPSHOT_DIR.exists():
-        return pd.DataFrame()
+    history = history.copy()
 
-    snapshot_files = list(
-        SNAPSHOT_DIR.glob("*.csv")
-    )
+    if "title" in history.columns:
+        history["product_name"] = history["title"]
 
-    for file in snapshot_files:
+    history["snapshot_date"] = pd.to_datetime(
+        history["snapshot_date"]
+    ).dt.date
 
-        try:
-
-            data = pd.read_csv(file)
-
-            if data.empty:
-                continue
-
-            data["snapshot_date"] = (
-                pd.to_datetime(
-                    data["timestamp"]
-                ).dt.date
-            )
-
-            all_records.append(data)
-
-        except Exception:
-            continue
-
-    if len(all_records) == 0:
-        return pd.DataFrame()
-
-    history = pd.concat(
-        all_records,
-        ignore_index=True
-    )
-
-    history = history.sort_values(
-        "snapshot_date"
-    )
-
-    return history
+    return history.sort_values("snapshot_date")
 
 def get_product_history(product_name):
 

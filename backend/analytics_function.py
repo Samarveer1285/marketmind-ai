@@ -1,31 +1,35 @@
-from database import supabase
 import pandas as pd
 import numpy as np
 
+from providers import get_provider
+
 
 def load_data():
+    """
+    Full snapshot history, renamed to the column names every function below
+    already expects (name/brand/price/rating/review_count/recorded_at).
+    Previously this queried Supabase's old "products"/"price_history" tables
+    directly -- which only ever held synthetic/random demo data, disconnected
+    from the real Flipkart scrapes -- via a module-level `from database import
+    supabase` that crashed on import if credentials were missing. Now sourced
+    from the shared provider (real data), with no import-time crash risk.
+    """
+    merged = get_provider().get_historical_snapshots()
 
-    products = supabase.table(
-        "products"
-    ).select("*").execute()
+    if merged.empty:
+        # No snapshots yet (e.g. before the first ingestion run has landed
+        # any rows). Every function below assumes these columns exist even
+        # on zero rows -- a bare pd.DataFrame() has none, which turns into a
+        # raw KeyError traceback on the very first .groupby()/.sort_values()
+        # a caller does. Return an empty frame shaped like the real one.
+        return pd.DataFrame(columns=[
+            "name", "brand", "category", "price", "rating",
+            "review_count", "recorded_at",
+        ])
 
-    price_history = supabase.table(
-        "price_history"
-    ).select("*").execute()
-
-    products_df = pd.DataFrame(
-        products.data
-    )
-
-    prices_df = pd.DataFrame(
-        price_history.data
-    )
-
-    merged = prices_df.merge(
-        products_df,
-        left_on="product_id",
-        right_on="id"
-    )
+    merged = merged.copy()
+    merged["name"] = merged["title"]
+    merged["recorded_at"] = pd.to_datetime(merged["snapshot_date"])
 
     return merged
 def get_brand_health():
