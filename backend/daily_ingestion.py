@@ -230,6 +230,21 @@ def upsert_to_supabase(df, category_slug, snapshot_date):
     if skipped:
         print(f"  Skipping {skipped} row(s) with no usable item_id/id")
 
+    # Apify sometimes returns the same product more than once in one batch
+    # (e.g. the same item_id listed under different sellers/pages). Postgres's
+    # upsert rejects a batch with duplicate conflict-target values outright
+    # ("ON CONFLICT DO UPDATE command cannot affect row a second time"), which
+    # was silently failing whole categories (seen for real: smartphones,
+    # tablets, power_banks) -- so dedupe on item_id before sending, keeping
+    # the first occurrence.
+    deduped = {}
+    for record in records:
+        deduped.setdefault(record["item_id"], record)
+    duplicates = len(records) - len(deduped)
+    if duplicates:
+        print(f"  Deduping {duplicates} duplicate item_id(s) within this batch")
+    records = list(deduped.values())
+
     if not records:
         return 0
 

@@ -1,4 +1,6 @@
 import os
+from functools import lru_cache
+
 from dotenv import load_dotenv
 
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -11,15 +13,23 @@ from langchain_tools import (
     category_tool
 )
 
-print("LOADED LANGCHAIN_AGENT FILE")
-
 load_dotenv()
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    google_api_key=os.getenv("GEMINI_API_KEY"),
-    temperature=0
-)
+
+@lru_cache(maxsize=1)
+def get_llm():
+    """
+    Lazy, cached Gemini client -- built on first actual use inside
+    ask_agent()'s try/except, not at import time. Previously this was built
+    at module level, so a missing/invalid GEMINI_API_KEY would crash on
+    import (taking down the AI Copilot and Executive Command Center pages
+    with a raw traceback) before ask_agent() ever got a chance to catch it.
+    """
+    return ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
+        google_api_key=os.getenv("GEMINI_API_KEY"),
+        temperature=0
+    )
 
 def route_question(question):
 
@@ -132,7 +142,9 @@ Base your response only on the market intelligence provided.
 
     try:
 
-        return llm.predict(executive_prompt)
+        llm = get_llm()
+
+        return llm.invoke(executive_prompt).content
 
     except Exception as e:
 
